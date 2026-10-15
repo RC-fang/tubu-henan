@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>禾力乡村·徒步河南 工作台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--p:#1a73e8;--pl:#e8f0fe;--ok:#34a853;--warn:#fbbc04;--err:#ea4335;--bg:#f0f2f5;--card:#fff;--t:#202124;--t2:#5f6368;--bd:#e0e0e0;--r:12px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--t);font-size:15px;padding-bottom:70px;-webkit-font-smoothing:antialiased}
+.top{background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;padding:14px 16px;position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center}
+.top h1{font-size:17px;font-weight:600}
+.top .station-sel{background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;cursor:pointer}
+.top .station-sel option{color:#333}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);display:flex;z-index:100;padding:4px 0 env(safe-area-inset-bottom,4px)}
+.bn-item{flex:1;text-align:center;padding:8px 4px;cursor:pointer;font-size:11px;color:var(--t2);transition:all .2s}
+.bn-item.active{color:var(--p)}
+.bn-item .icon{font-size:22px;display:block;margin-bottom:2px}
+.page{display:none;padding:12px}
+.page.active{display:block}
+.card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-title{font-size:15px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+.stat{background:var(--card);border-radius:var(--r);padding:14px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat .v{font-size:26px;font-weight:700;color:var(--p)}
+.stat .l{font-size:12px;color:var(--t2);margin-top:2px}
+.stat.ok .v{color:var(--ok)}.stat.warn .v{color:var(--warn)}.stat.err .v{color:var(--err)}
+.form-group{margin-bottom:14px}
+.form-group label{display:block;font-size:13px;color:var(--t2);margin-bottom:4px;font-weight:500}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:12px;border:1px solid var(--bd);border-radius:8px;font-size:16px;background:#fff;transition:border .2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--p)}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;text-align:center}
+.btn-primary{background:var(--p);color:#fff}
+.btn-primary:active{background:#1557b0}
+.btn-ok{background:var(--ok);color:#fff}
+.btn-warn{background:var(--warn);color:#fff}
+.btn-err{background:var(--err);color:#fff}
+.btn-outline{background:#fff;color:var(--p);border:1px solid var(--p)}
+.btn-sm{padding:8px 16px;font-size:13px;display:inline-block;width:auto}
+.checklist-item{display:flex;align-items:flex-start;padding:12px;border-bottom:1px solid #f0f0f0;gap:10px}
+.checklist-item:last-child{border-bottom:none}
+.checklist-item input[type=checkbox]{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--p)}
+.checklist-item .info{flex:1}
+.checklist-item .info .name{font-size:14px;font-weight:500}
+.checklist-item .info .meta{font-size:12px;color:var(--t2);margin-top:2px}
+.checklist-item .tag{font-size:11px;padding:2px 8px;border-radius:10px;flex:none}
+.tag-ok{background:#e6f4ea;color:#137333}
+.tag-warn{background:#fef7e0;color:#b06000}
+.tag-err{background:#fce8e6;color:#c5221f}
+.tag-blue{background:var(--pl);color:var(--p)}
+.score-row{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#f8f9fa;border-radius:8px;margin-bottom:8px}
+.score-row .label{font-size:14px;flex:1}
+.score-row input{width:60px;padding:8px;text-align:center;border:1px solid var(--bd);border-radius:6px;font-size:16px;font-weight:600}
+.score-row .max{font-size:12px;color:var(--t2);margin-left:4px}
+.chart-box{position:relative;height:240px;margin:10px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px;text-align:left;border-bottom:1px solid var(--bd)}
+th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
+.badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.badge-ok{background:#e6f4ea;color:#137333}
+.badge-warn{background:#fef7e0;color:#b06000}
+.badge-err{background:#fce8e6;color:#c5221f}
+.badge-blue{background:var(--pl);color:var(--p)}
+.issue-item{padding:12px;border-left:3px solid var(--err);background:#fef7e0;border-radius:0 8px 8px 0;margin-bottom:8px}
+.issue-item.resolved{border-left-color:var(--ok);background:#e6f4ea}
+.issue-item .title{font-weight:600;font-size:14px}
+.issue-item .meta{font-size:12px;color:var(--t2);margin-top:4px}
+.modal-bg{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:16px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:20px;max-width:500px;width:100%;max-height:80vh;overflow-y:auto}
+.modal h3{font-size:17px;margin-bottom:14px}
+.toast{position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:14px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.photo-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border:2px dashed var(--bd);border-radius:8px;cursor:pointer;color:var(--t2);font-size:14px}
+.photo-btn:active{border-color:var(--p);color:var(--p)}
+.divider{height:1px;background:var(--bd);margin:14px 0}
+.empty{text-align:center;padding:30px;color:var(--t2)}
+.progress{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-top:4px}
+.progress-fill{height:100%;background:var(--p);border-radius:3px;transition:width .3s}
+@media(min-width:768px){.stats{grid-template-columns:repeat(4,1fr)}.page{max-width:720px;margin:0 auto}.chart-box{height:300px}}
+</style>
+</head>
+<body>
+
+<!-- ===== 登录页面 ===== -->
+<div id="loginPage" style="position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(135deg,#1a73e8,#0d47a1);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px">
+<div style="background:#fff;border-radius:20px;padding:40px 30px;max-width:360px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,.2)">
+<div style="text-align:center;margin-bottom:30px">
+<div style="font-size:48px;margin-bottom:10px">🥾</div>
+<h1 style="font-size:22px;color:#1a73e8;margin-bottom:8px">禾力乡村·徒步河南</h1>
+<p style="font-size:14px;color:#666">工作台</p>
+</div>
+<div class="form-group">
+<label>账号</label>
+<input type="text" id="loginUser" placeholder="请输入账号" autocomplete="username">
+</div>
+<div class="form-group">
+<label>密码</label>
+<input type="password" id="loginPass" placeholder="请输入密码" autocomplete="current-password">
+</div>
+<button class="btn btn-primary" onclick="doLogin()" style="margin-top:10px">登录</button>
+<div id="loginError" style="color:#ea4335;font-size:13px;text-align:center;margin-top:12px;display:none"></div>
+<div style="text-align:center;margin-top:20px;font-size:12px;color:#999">
+<a href="javascript:showLeaderView()" style="color:#1a73e8">领导查看入口</a>
+</div>
+</div>
+</div>
+
+<!-- ===== 主应用 ===== -->
+<div id="mainApp" style="display:none">
+
+<div class="top">
+<h1>禾力乡村·徒步河南</h1>
+<div style="display:flex;align-items:center;gap:10px">
+<span id="userInfo" style="font-size:13px;opacity:.9"></span>
+<select class="station-sel" id="stationSel" onchange="handleStationChange(this.value)">
+<option value="new">+ 新增站点</option>
+</select>
+</div>
+</div>
+
+<!-- ===== 首页 ===== -->
+<div class="page active" id="pg-home">
+<div class="card" style="background:linear-gradient(135deg,#1a73e8,#0d47a1);color:#fff;margin-bottom:16px">
+<div style="font-size:13px;opacity:.9;margin-bottom:8px">累计总览</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+<div><div style="font-size:24px;font-weight:700" id="totalReg">0</div><div style="font-size:11px;opacity:.8">总报名</div></div>
+<div><div style="font-size:24px;font-weight:700" id="totalCheckin">0</div><div style="font-size:11px;opacity:.8">总到场</div></div>
+<div><div style="font-size:24px;font-weight:700" id="totalFinish">0</div><div style="font-size:11px;opacity:.8">总完赛</div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+<div><div style="font-size:18px;font-weight:600" id="totalArticles">0</div><div style="font-size:11px;opacity:.8">总发稿</div></div>
+<div><div style="font-size:18px;font-weight:600" id="totalReads">0</div><div style="font-size:11px;opacity:.8">总阅读(万)</div></div>
+<div><div style="font-size:18px;font-weight:600" id="totalStations">0</div><div style="font-size:11px;opacity:.8">已办场次</div></div>
+</div>
+<div style="border-top:1px solid rgba(255,255,255,.2);padding-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+<div><div style="font-size:16px;font-weight:600" id="totalContract">0</div><div style="font-size:11px;opacity:.8">总签约(万)</div></div>
+<div><div style="font-size:16px;font-weight:600" id="totalPaid">0</div><div style="font-size:11px;opacity:.8">总到款(万)</div></div>
+<div><div style="font-size:16px;font-weight:600" id="totalCost">0</div><div style="font-size:11px;opacity:.8">总成本(万)</div></div>
+</div>
+</div>
+<div class="stats" id="homeStats"></div>
+<div class="card">
+<div class="card-title">筹备进度</div>
+<div id="homeChecklist"></div>
+</div>
+<div class="card">
+<div class="card-title">八站趋势</div>
+<div class="chart-box"><canvas id="chartHome"></canvas></div>
+</div>
+</div>
+
+<!-- ===== 筹备 ===== -->
+<div class="page" id="pg-prep">
+<div class="card">
+<div class="card-title">筹备任务清单 <span style="font-size:12px;color:var(--t2);font-weight:400" id="prepProgress"></span></div>
+<div id="prepChecklist"></div>
+</div>
+<div class="card">
+<div class="card-title">红线预警</div>
+<div id="redFlags"></div>
+</div>
+</div>
+
+<!-- ===== 现场 ===== -->
+<div class="page" id="pg-live">
+<div class="card">
+<div class="card-title">现场问题记录</div>
+<div class="form-group"><label>问题描述</label><textarea id="issueText" placeholder="描述发现的问题..."></textarea></div>
+<div class="form-row">
+<div class="form-group"><label>责任方</label><select id="issueParty"><option>我方</option><option>微景</option><option>会务公司</option><option>属地</option></select></div>
+<div class="form-group"><label>严重程度</label><select id="issueLevel"><option value="high">严重</option><option value="mid" selected>中等</option><option value="low">轻微</option></select></div>
+</div>
+<div class="form-group"><label>拍照</label><label class="photo-btn"><input type="file" accept="image/*" capture="environment" id="issuePhoto" style="display:none">点击拍照或选择图片</label></div>
+<button class="btn btn-err" onclick="addIssue()">提交问题</button>
+</div>
+<div class="card">
+<div class="card-title">已记录问题 <span style="font-size:12px;color:var(--t2);font-weight:400" id="issueCount"></span></div>
+<div id="issueList"></div>
+</div>
+</div>
+
+<!-- ===== 数据 ===== -->
+<div class="page" id="pg-data">
+<div class="card">
+<div class="card-title">参与数据</div>
+<div class="form-row">
+<div class="form-group"><label>报名人数</label><input type="number" id="dReg" placeholder="0"></div>
+<div class="form-group"><label>打卡人数</label><input type="number" id="dCheckin" placeholder="0"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>完赛人数</label><input type="number" id="dFinish" placeholder="0"></div>
+<div class="form-group"><label>展位数</label><input type="number" id="dBooth" placeholder="0"></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title">传播数据</div>
+<div class="form-row">
+<div class="form-group"><label>发稿次数</label><input type="number" id="dArticles" placeholder="0"></div>
+<div class="form-group"><label>阅读量</label><input type="number" id="dReads" placeholder="0"></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title">招商数据</div>
+<div class="form-row">
+<div class="form-group"><label>签约金额(万)</label><input type="number" id="dContractAmt" step="0.1" placeholder="0"></div>
+<div class="form-group"><label>到款金额(万)</label><input type="number" id="dPaidAmt" step="0.1" placeholder="0"></div>
+</div>
+</div>
+<div class="card">
+<div class="card-title">成本数据</div>
+<div class="form-row">
+<div class="form-group"><label>实际成本(万)</label><input type="number" id="dCost" step="0.01" placeholder="6.00"></div>
+<div class="form-group"><label>展位销售额(元)</label><input type="number" id="dBoothSales" placeholder="0"></div>
+</div>
+</div>
+<button class="btn btn-primary" onclick="saveData()">保存数据</button>
+</div>
+
+<!-- ===== 评分 ===== -->
+<div class="page" id="pg-score">
+<div class="card">
+<div class="card-title">活动成效（40分）</div>
+<div class="score-row"><div class="label">报名完成率<br><small style="color:var(--t2)">目标≥80%</small></div><input type="number" id="s1" min="0" max="8" onchange="calcScore()"><span class="max">/8</span></div>
+<div class="score-row"><div class="label">打卡到场率<br><small style="color:var(--t2)">目标≥60%</small></div><input type="number" id="s2" min="0" max="8" onchange="calcScore()"><span class="max">/8</span></div>
+<div class="score-row"><div class="label">完赛率<br><small style="color:var(--t2)">目标≥70%</small></div><input type="number" id="s3" min="0" max="6" onchange="calcScore()"><span class="max">/6</span></div>
+<div class="score-row"><div class="label">传播曝光量<br><small style="color:var(--t2)">目标≥10万次</small></div><input type="number" id="s4" min="0" max="8" onchange="calcScore()"><span class="max">/8</span></div>
+<div class="score-row"><div class="label">新华网发稿量<br><small style="color:var(--t2)">目标≥5篇</small></div><input type="number" id="s5" min="0" max="4" onchange="calcScore()"><span class="max">/4</span></div>
+<div class="score-row"><div class="label">招商金额<br><small style="color:var(--t2)">目标≥5万</small></div><input type="number" id="s6" min="0" max="6" onchange="calcScore()"><span class="max">/6</span></div>
+</div>
+<div class="card">
+<div class="card-title">执行质量（25分）</div>
+<div class="score-row"><div class="label">物料到位率</div><input type="number" id="s7" min="0" max="8" onchange="calcScore()"><span class="max">/8</span></div>
+<div class="score-row"><div class="label">路线与方案一致性</div><input type="number" id="s8" min="0" max="7" onchange="calcScore()"><span class="max">/7</span></div>
+<div class="score-row"><div class="label">流程执行</div><input type="number" id="s9" min="0" max="5" onchange="calcScore()"><span class="max">/5</span></div>
+<div class="score-row"><div class="label">展位管理</div><input type="number" id="s10" min="0" max="5" onchange="calcScore()"><span class="max">/5</span></div>
+</div>
+<div class="card">
+<div class="card-title">成本合规（15分）</div>
+<div class="score-row"><div class="label">53项物料齐全率</div><input type="number" id="s11" min="0" max="8" onchange="calcScore()"><span class="max">/8</span></div>
+<div class="score-row"><div class="label">支出确认书提交</div><input type="number" id="s12" min="0" max="4" onchange="calcScore()"><span class="max">/4</span></div>
+<div class="score-row"><div class="label">招商收入匹配度</div><input type="number" id="s13" min="0" max="3" onchange="calcScore()"><span class="max">/3</span></div>
+</div>
+<div class="card">
+<div class="card-title">安全与风控（10分）</div>
+<div class="score-row"><div class="label">安全预案落实</div><input type="number" id="s14" min="0" max="5" onchange="calcScore()"><span class="max">/5</span></div>
+<div class="score-row"><div class="label">保险覆盖<br><small style="color:var(--t2)">未全覆盖=一票否决</small></div><input type="number" id="s15" min="0" max="5" onchange="calcScore()"><span class="max">/5</span></div>
+</div>
+<div class="card">
+<div class="card-title">协同配合（10分）</div>
+<div class="score-row"><div class="label">属地对接配合度</div><input type="number" id="s16" min="0" max="5" onchange="calcScore()"><span class="max">/5</span></div>
+<div class="score-row"><div class="label">微景响应速度</div><input type="number" id="s17" min="0" max="5" onchange="calcScore()"><span class="max">/5</span></div>
+</div>
+<div class="card" style="text-align:center;background:var(--pl)">
+<div style="font-size:14px;color:var(--t2)">总分</div>
+<div style="font-size:42px;font-weight:700;color:var(--p)" id="totalScore">0</div>
+<div style="font-size:14px;color:var(--t2)" id="scoreGrade">—</div>
+</div>
+<div style="display:flex;gap:10px">
+<button class="btn btn-primary" style="flex:1" onclick="saveScore()">保存评分</button>
+<button class="btn btn-outline" style="flex:1" onclick="showScoreHistory()">历史记录</button>
+</div>
+<div class="card" style="margin-top:12px">
+<button class="btn btn-outline btn-sm" onclick="showScoreGuide()">评分机制说明</button>
+</div>
+</div>
+
+<!-- ===== 合同 ===== -->
+<div class="page" id="pg-contract">
+<div class="card">
+<div class="card-title">添加合同</div>
+<div class="form-group"><label>合作方名称</label><input type="text" id="cName" placeholder="如：七峰山景区"></div>
+<div class="form-row">
+<div class="form-group"><label>合同类型</label><select id="cType"><option>景区合作</option><option>赞助</option><option>政府支持</option><option>其他</option></select></div>
+<div class="form-group"><label>金额(万元)</label><input type="number" id="cAmt" step="0.1" placeholder="0"></div>
+</div>
+<div class="form-row">
+<div class="form-group"><label>签订状态</label><select id="cSign"><option value="signed">已签署</option><option value="draft">已定稿</option><option value="unsigned">未签署</option></select></div>
+<div class="form-group"><label>到款状态</label><select id="cPay"><option value="paid">已到款</option><option value="unpaid">未到款</option></select></div>
+</div>
+<button class="btn btn-primary" onclick="addContract()">添加合同</button>
+</div>
+<div class="card">
+<div class="card-title">合同台账</div>
+<div id="contractList"></div>
+</div>
+<div class="stats" id="contractStats"></div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
+<div class="modal" id="modalContent"></div>
+</div>
+
+<!-- Bottom Nav -->
+<div class="bottom-nav">
+<div class="bn-item active" data-page="home"><span class="icon">📊</span>首页</div>
+<div class="bn-item" data-page="prep"><span class="icon">✅</span>筹备</div>
+<div class="bn-item" data-page="live"><span class="icon">📝</span>现场</div>
+<div class="bn-item" data-page="data"><span class="icon">📥</span>数据</div>
+<div class="bn-item" data-page="score"><span class="icon">⭐</span>评分</div>
+<div class="bn-item" data-page="contract"><span class="icon">💰</span>合同</div>
+</div>
+
+<!-- 退出登录按钮 -->
+<button onclick="logout()" style="position:fixed;top:80px;right:16px;background:rgba(255,255,255,.9);border:1px solid #ddd;padding:6px 12px;border-radius:20px;font-size:12px;cursor:pointer;z-index:99">退出</button>
+
+</div><!-- /mainApp -->
+
+<script>
+// ===== Data Store =====
+const STD_COST = 6; // 万元/场
+const HIST = {
+1:{name:'登封',date:'2026-04-11',reg:797,checkin:496,finish:404,articles:8,reads:820,booth:0,cost:11.92,contractAmt:0,paidAmt:0},
+2:{name:'光山',date:'2026-04-26',reg:822,checkin:534,finish:454,articles:8,reads:1000,booth:0,cost:9.48,contractAmt:0,paidAmt:0},
+3:{name:'汝阳',date:'2026-05-31',reg:1090,checkin:679,finish:557,articles:10,reads:2000,booth:0,cost:7.93,contractAmt:0,paidAmt:0},
+4:{name:'淇滨',date:'2026-06-14',reg:910,checkin:531,finish:391,articles:8,reads:1000,booth:0,cost:6.97,contractAmt:0,paidAmt:0},
+5:{name:'辉县',date:'2026-06-30',reg:600,checkin:331,finish:250,articles:4,reads:530.1,booth:0,cost:8.55,contractAmt:0,paidAmt:0},
+6:{name:'汤阴',date:'2026-08-30',reg:797,checkin:584,finish:499,articles:7,reads:920,booth:0,cost:7.85,contractAmt:0,paidAmt:0},
+7:{name:'林州',date:'2026-09-06',reg:600,checkin:362,finish:319,articles:8,reads:2100,booth:0,cost:6.22,contractAmt:0,paidAmt:0},
+8:{name:'方城',date:'2026-10-01',reg:665,checkin:417,finish:325,articles:7,reads:1500,booth:31,cost:6,contractAmt:0,paidAmt:0}
+};
+
+let curStation = 9;
+let store = JSON.parse(localStorage.getItem('tubu_workbench')||'{}');
+function initStore(){
+  if(!store.stations) store.stations = JSON.parse(JSON.stringify(HIST));
+  if(!store.checklists) store.checklists = {};
+  if(!store.issues) store.issues = {};
+  if(!store.scores) store.scores = {};
+  if(!store.contracts) store.contracts = {};
+}
+function save(){localStorage.setItem('tubu_workbench',JSON.stringify(store))}
+function getStation(n){return store.stations[n]||{}}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000)}
+
+// ===== Navigation =====
+document.querySelectorAll('.bn-item').forEach(item=>{
+  item.addEventListener('click',function(){
+    document.querySelectorAll('.bn-item').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    this.classList.add('active');
+    document.getElementById('pg-'+this.dataset.page).classList.add('active');
+    renderPage(this.dataset.page);
+  });
+});
+
+function handleStationChange(val){
+  if(val==='new'){
+    const name=prompt('请输入新站点名称（如：第10站·郑州）');
+    if(name){
+      const nums=Object.keys(store.stations).map(Number).filter(n=>n>0);
+      const nextNum=nums.length?Math.max(...nums)+1:1;
+      store.stations[nextNum]={name,date:'',reg:0,checkin:0,finish:0,articles:0,reads:0,booth:0,cost:0,contractAmt:0,paidAmt:0,boothSales:0};
+      save();
+      populateStationSelector();
+      curStation=nextNum;
+      document.getElementById('stationSel').value=nextNum;
+      renderPage('home');
+      toast('已添加'+name);
+    }else{
+      document.getElementById('stationSel').value=curStation;
+    }
+    return;
+  }
+  curStation=parseInt(val);
+  renderPage('home');
+}
+
+function populateStationSelector(){
+  const sel=document.getElementById('stationSel');
+  const nums=Object.keys(store.stations).map(Number).filter(n=>n>0).sort((a,b)=>b-a);
+  sel.innerHTML='<option value="new">+ 新增站点</option>';
+  nums.forEach(n=>{
+    const s=store.stations[n];
+    const opt=document.createElement('option');
+    opt.value=n;opt.textContent='第'+n+'站·'+(s.name||'未知');
+    if(n===curStation) opt.selected=true;
+    sel.appendChild(opt);
+  });
+}
+
+// ===== Checklist Template =====
+const CHECKLIST = [
+{phase:'落地确认',tasks:['活动日期确认（≥14天筹备）','活动场地确认','路线方案确认','组织架构拟定','活动规模确定','奖项方案确定']},
+{phase:'属地对接',tasks:['召开专项调度会','属地宣传材料收集','乡村百科知识库搭建','展位招募（10-15个）','奖品赞助对接（≥2.5万）','嘉宾邀请','主持人/摄影师协调','景区门票协调']},
+{phase:'内容制作',tasks:['路线数字采集上线','报名推文发布','推文转载协调','活动详情推文发布','推文体稿件发布','倒计时海报/推文','预热视频制作','物料设计定稿','奖牌设计开模（T-15）','主持词/发言稿','安全方案定稿']},
+{phase:'落地执行',tasks:['第二次调度会','嘉宾最终确认','奖品赞助到位','保障部门对接','志愿者到位','物料运输到场','现场搭建','通信信号测试','路线巡场','主持人彩排','电力保障确认','天气观测']},
+{phase:'活动当天',tasks:['签到&物资发放','开场流程执行','徒步环节执行','展位展销管理','颁奖仪式','现场问题记录','摄影摄像','落幕推文发布']},
+{phase:'赛后复盘',tasks:['平台数据导出','传播数据汇总','展位反馈回收','嘉宾食宿行统计','属地消费/客流数据催收','活动总结报告','评分表填写','复盘会','数据归档']}
+];
+
+function renderChecklist(phase){
+  const key=curStation+'_'+phase;
+  if(!store.checklists[key]) store.checklists[key]={};
+  const tasks=CHECKLIST.find(c=>c.phase===phase)?.tasks||[];
+  const isViewer = AUTH.currentUser?.role === 'viewer';
+  const dis = isViewer ? 'disabled' : '';
+  let html='';
+  tasks.forEach((t,i)=>{
+    const checked=store.checklists[key][i]?'checked':'';
+    html+=`<div class="checklist-item"><input type="checkbox" ${checked} ${dis} onchange="toggleCheck('${phase}',${i})"><div class="info"><div class="name">${t}</div></div></div>`;
+  });
+  return html;
+}
+function toggleCheck(phase,idx){
+  const key=curStation+'_'+phase;
+  if(!store.checklists[key]) store.checklists[key]={};
+  store.checklists[key][idx]=!store.checklists[key][idx];
+  save();renderPrep();
+}
+function getChecklistProgress(){
+  let total=0,done=0;
+  CHECKLIST.forEach(c=>{
+    const key=curStation+'_'+c.phase;
+    c.tasks.forEach((_,i)=>{total++;if(store.checklists[key]?.[i])done++});
+  });
+  return {total,done,pct:total?Math.round(done/total*100):0};
+}
+
+// ===== Render Pages =====
+function renderPage(page){
+  if(page==='home') renderHome();
+  else if(page==='prep') renderPrep();
+  else if(page==='live') renderIssues();
+  else if(page==='data') renderDataForm();
+  else if(page==='score') renderScoreForm();
+  else if(page==='contract') renderContracts();
+  // 领导查看模式：每次渲染后重新禁用编辑
+  if(AUTH.currentUser?.role === 'viewer') disableEditing();
+}
+
+function renderHome(){
+  // Calculate totals
+  let tReg=0,tCheckin=0,tFinish=0,tArticles=0,tReads=0,tStations=0,tContract=0,tPaid=0,tCost=0;
+  for(let i=1;i<=20;i++){
+    const s=store.stations[i];
+    if(s&&s.reg){tReg+=s.reg||0;tCheckin+=s.checkin||0;tFinish+=s.finish||0;tArticles+=s.articles||0;tReads+=s.reads||0;tStations++;tContract+=s.contractAmt||0;tPaid+=s.paidAmt||0;tCost+=s.cost||0}
+  }
+  document.getElementById('totalReg').textContent=tReg.toLocaleString();
+  document.getElementById('totalCheckin').textContent=tCheckin.toLocaleString();
+  document.getElementById('totalFinish').textContent=tFinish.toLocaleString();
+  document.getElementById('totalArticles').textContent=tArticles;
+  document.getElementById('totalReads').textContent=tReads;
+  document.getElementById('totalStations').textContent=tStations;
+  document.getElementById('totalContract').textContent=tContract.toFixed(1);
+  document.getElementById('totalPaid').textContent=tPaid.toFixed(1);
+  document.getElementById('totalCost').textContent=tCost.toFixed(1);
+
+  const s=getStation(curStation);
+  const showRate=s.reg?((s.checkin/s.reg)*100).toFixed(1):'—';
+  const compRate=s.checkin?((s.finish/s.checkin)*100).toFixed(1):'—';
+  document.getElementById('homeStats').innerHTML=`
+    <div class="stat"><div class="v">${s.reg||'—'}</div><div class="l">第${curStation}站报名</div></div>
+    <div class="stat ok"><div class="v">${showRate}%</div><div class="l">到场率</div></div>
+    <div class="stat"><div class="v">${s.articles||'—'}</div><div class="l">发稿次数</div></div>
+    <div class="stat warn"><div class="v">${s.reads?s.reads+'万':'—'}</div><div class="l">阅读量</div></div>`;
+  const prog=getChecklistProgress();
+  document.getElementById('homeChecklist').innerHTML=`
+    <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>第${curStation}站筹备 已完成 ${prog.done}/${prog.total}</span><span style="color:var(--p);font-weight:600">${prog.pct}%</span></div>
+    <div class="progress"><div class="progress-fill" style="width:${prog.pct}%"></div></div>`;
+  renderHomeChart();
+}
+
+function renderHomeChart(){
+  const canvas=document.getElementById('chartHome');
+  if(!canvas)return;
+  const container=canvas.parentElement;
+  const w=container.clientWidth-20;
+  const h=260;
+  canvas.width=w*2;canvas.height=h*2;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(2,2);
+  ctx.clearRect(0,0,w,h);
+
+  // Collect data for all stations
+  const stations=[];
+  for(let i=1;i<=20;i++){
+    const s=store.stations[i];
+    if(s&&s.reg) stations.push({num:i,name:s.name,cost:s.cost||0,contract:s.contractAmt||0,reg:s.reg||0,checkin:s.checkin||0});
+  }
+  if(stations.length<2){
+    ctx.fillStyle='#999';ctx.font='14px sans-serif';ctx.textAlign='center';
+    ctx.fillText('至少需要2场数据才能显示趋势图',w/2,h/2);
+    return;
+  }
+
+  const pad={top:20,right:20,bottom:40,left:50};
+  const cw=w-pad.left-pad.right;
+  const ch=h-pad.top-pad.bottom;
+
+  // Find max values
+  const maxCost=Math.max(...stations.map(s=>s.cost),10);
+  const maxContract=Math.max(...stations.map(s=>s.contract),10);
+  const maxVal=Math.max(maxCost,maxContract)*1.2;
+
+  // Draw grid
+  ctx.strokeStyle='#eee';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.top+ch*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(w-pad.right,y);ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='11px sans-serif';ctx.textAlign='right';
+    ctx.fillText((maxVal*i/4).toFixed(1),pad.left-8,y+4);
+  }
+
+  // Draw x-axis labels
+  ctx.fillStyle='#666';ctx.font='11px sans-serif';ctx.textAlign='center';
+  stations.forEach((s,i)=>{
+    const x=pad.left+cw*i/(stations.length-1);
+    ctx.fillText(s.name,x,h-pad.bottom+20);
+  });
+
+  // Draw cost line (red)
+  ctx.strokeStyle='#ea4335';ctx.lineWidth=2.5;ctx.beginPath();
+  stations.forEach((s,i)=>{
+    const x=pad.left+cw*i/(stations.length-1);
+    const y=pad.top+ch*(1-s.cost/maxVal);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // Cost dots
+  stations.forEach((s,i)=>{
+    const x=pad.left+cw*i/(stations.length-1);
+    const y=pad.top+ch*(1-s.cost/maxVal);
+    ctx.fillStyle='#ea4335';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+  });
+
+  // Draw contract line (blue)
+  ctx.strokeStyle='#1a73e8';ctx.lineWidth=2.5;ctx.beginPath();
+  stations.forEach((s,i)=>{
+    const x=pad.left+cw*i/(stations.length-1);
+    const y=pad.top+ch*(1-s.contract/maxVal);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // Contract dots
+  stations.forEach((s,i)=>{
+    const x=pad.left+cw*i/(stations.length-1);
+    const y=pad.top+ch*(1-s.contract/maxVal);
+    ctx.fillStyle='#1a73e8';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
+  });
+
+  // Legend
+  const lx=pad.left+10,ly=8;
+  ctx.fillStyle='#ea4335';ctx.fillRect(lx,ly,12,3);ctx.fillStyle='#666';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('成本(万)',lx+16,ly+4);
+  ctx.fillStyle='#1a73e8';ctx.fillRect(lx+80,ly,12,3);ctx.fillStyle='#666';ctx.fillText('签约(万)',lx+96,ly+4);
+}
+
+function renderPrep(){
+  let html='';
+  CHECKLIST.forEach(c=>{
+    const key=curStation+'_'+c.phase;
+    const tasks=c.tasks;
+    let done=0;tasks.forEach((_,i)=>{if(store.checklists[key]?.[i])done++});
+    html+=`<div style="margin-bottom:12px"><div style="font-weight:600;font-size:14px;margin-bottom:6px;display:flex;justify-content:space-between"><span>${c.phase}</span><span style="font-size:12px;color:var(--t2)">${done}/${tasks.length}</span></div>${renderChecklist(c.phase)}</div>`;
+  });
+  document.getElementById('prepChecklist').innerHTML=html;
+  const prog=getChecklistProgress();
+  document.getElementById('prepProgress').textContent=`${prog.done}/${prog.total} (${prog.pct}%)`;
+  // Red flags
+  const s=getStation(curStation);
+  let flags='';
+  if(s.booth>20) flags+=`<div class="issue-item"><div class="title">展位${s.booth}个，超过20个上限</div><div class="meta">建议精简至10-15个</div></div>`;
+  if(s.cost>STD_COST) flags+=`<div class="issue-item"><div class="title">实际成本${s.cost}万，超标准${STD_COST}万</div><div class="meta">超标${(s.cost-STD_COST).toFixed(2)}万</div></div>`;
+  document.getElementById('redFlags').innerHTML=flags||'<div class="empty">暂无预警</div>';
+}
+
+function renderIssues(){
+  const issues=store.issues[curStation]||[];
+  document.getElementById('issueCount').textContent=issues.length+'条';
+  let html='';
+  issues.forEach((iss,i)=>{
+    const cls=iss.resolved?'resolved':'';
+    const level=iss.level==='high'?'严重':iss.level==='mid'?'中等':'轻微';
+    html+=`<div class="issue-item ${cls}"><div class="title">${iss.text}</div><div class="meta">${iss.party} · ${level} · ${iss.time}${iss.photo?' · 📷有照片':''}</div><div style="margin-top:6px;display:flex;gap:6px">${iss.resolved?'<span class="badge badge-ok">已解决</span>':`<button class="btn btn-ok btn-sm" onclick="resolveIssue(${i})">标记解决</button>`}</div></div>`;
+  });
+  document.getElementById('issueList').innerHTML=html||'<div class="empty">暂无问题记录</div>';
+}
+
+function addIssue(){
+  const text=document.getElementById('issueText').value.trim();
+  if(!text){toast('请输入问题描述');return}
+  if(!store.issues[curStation]) store.issues[curStation]=[];
+  const photo=document.getElementById('issuePhoto').files.length>0;
+  store.issues[curStation].push({text,party:document.getElementById('issueParty').value,level:document.getElementById('issueLevel').value,time:new Date().toLocaleString('zh-CN'),photo,resolved:false});
+  save();document.getElementById('issueText').value='';renderIssues();toast('问题已记录');
+}
+function resolveIssue(i){store.issues[curStation][i].resolved=true;save();renderIssues();toast('已标记解决')}
+
+function renderDataForm(){
+  const s=getStation(curStation);
+  document.getElementById('dReg').value=s.reg||'';
+  document.getElementById('dCheckin').value=s.checkin||'';
+  document.getElementById('dFinish').value=s.finish||'';
+  document.getElementById('dBooth').value=s.booth||'';
+  document.getElementById('dArticles').value=s.articles||'';
+  document.getElementById('dReads').value=s.reads||'';
+  document.getElementById('dContractAmt').value=s.contractAmt||'';
+  document.getElementById('dPaidAmt').value=s.paidAmt||'';
+  document.getElementById('dCost').value=s.cost||'';
+  document.getElementById('dBoothSales').value=s.boothSales||'';
+}
+function saveData(){
+  if(!store.stations[curStation]) store.stations[curStation]={name:'第'+curStation+'站',date:''};
+  const s=store.stations[curStation];
+  s.reg=+document.getElementById('dReg').value||0;
+  s.checkin=+document.getElementById('dCheckin').value||0;
+  s.finish=+document.getElementById('dFinish').value||0;
+  s.booth=+document.getElementById('dBooth').value||0;
+  s.articles=+document.getElementById('dArticles').value||0;
+  s.reads=+document.getElementById('dReads').value||0;
+  s.contractAmt=+document.getElementById('dContractAmt').value||0;
+  s.paidAmt=+document.getElementById('dPaidAmt').value||0;
+  s.cost=+document.getElementById('dCost').value||0;
+  s.boothSales=+document.getElementById('dBoothSales').value||0;
+  save();toast('数据已保存');
+  // Update home page totals if visible
+  if(document.getElementById('pg-home').classList.contains('active')) renderHome();
+}
+
+function renderScoreForm(){
+  const sc=store.scores[curStation];
+  if(sc){for(let i=1;i<=17;i++){const el=document.getElementById('s'+i);if(el)el.value=sc['s'+i]||''}calcScore()}
+}
+function calcScore(){
+  let total=0;
+  for(let i=1;i<=17;i++){total+=+document.getElementById('s'+i).value||0}
+  document.getElementById('totalScore').textContent=total;
+  let grade='';
+  if(total>=90) grade='A级 · 优先结算';
+  else if(total>=80) grade='B级 · 正常结算';
+  else if(total>=70) grade='C级 · 限期整改';
+  else grade='D级 · 暂停结算';
+  document.getElementById('scoreGrade').textContent=grade;
+}
+function saveScore(){
+  const sc={};
+  for(let i=1;i<=17;i++) sc['s'+i]=+document.getElementById('s'+i).value||0;
+  sc.total=Object.values(sc).reduce((a,b)=>a+b,0);
+  sc.date=new Date().toLocaleString('zh-CN');
+  store.scores[curStation]=sc;
+  save();toast('评分已保存');
+}
+function showScoreHistory(){
+  let html='<h3>评分历史</h3>';
+  const keys=Object.keys(store.scores).sort((a,b)=>a-b);
+  if(!keys.length){html+='<div class="empty">暂无评分记录</div>'}
+  else{html+='<table><tr><th>站次</th><th>总分</th><th>等级</th><th>时间</th></tr>';
+    keys.forEach(k=>{const sc=store.scores[k];const s=store.stations[k]||{};
+      let g=sc.total>=90?'A':sc.total>=80?'B':sc.total>=70?'C':'D';
+      html+=`<tr><td>${s.name||'第'+k+'站'}</td><td><b>${sc.total}</b></td><td>${g}</td><td>${sc.date}</td></tr>`});
+    html+='</table>'}
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('modalBg').classList.add('show');
+}
+function showScoreGuide(){
+  document.getElementById('modalContent').innerHTML=`<h3>评分机制说明</h3>
+  <p style="font-size:14px;line-height:1.8;color:var(--t2)">
+  <b>一、评分定位</b><br>本评分系统用于"禾力乡村·徒步河南"每站活动的双向评价。评分对象为我方与微景双方，谁的问题谁负责改进。<br><br>
+  <b>二、评分维度（满分100分）</b><br>
+  · 活动成效（40分）：报名完成率8分、到场率8分、完赛率6分、曝光量8分、发稿量4分、招商6分<br>
+  · 执行质量（25分）：物料到位8分、路线一致7分、流程执行5分、展位管理5分<br>
+  · 成本合规（15分）：物料齐全率8分、支出确认4分、招商匹配3分<br>
+  · 安全与风控（10分）：预案落实5分、保险覆盖5分<br>
+  · 协同配合（10分）：属地配合5分、微景响应5分<br><br>
+  <b>三、等级标准</b><br>
+  · A级（≥90分）：优先结算，优先承接下一站<br>
+  · B级（80-89分）：正常结算<br>
+  · C级（70-79分）：限期整改，扣减管理费<br>
+  · D级（<70分）：暂停结算，专项审计<br><br>
+  <b>四、成本基准</b><br>
+  标准化成本：6万元/场（固定支付微景，含税不含赞助）<br><br>
+  <b>五、数据来源</b><br>
+  · 活动成效：禾力乡村平台后台数据（不可修改）<br>
+  · 传播数据：我方采编团队记录<br>
+  · 执行质量：我方现场人员独立打分<br>
+  · 成本合规：微景提交支出确认书<br>
+  · 安全/协同：现场观察+双方互评</p>`;
+  document.getElementById('modalBg').classList.add('show');
+}
+function closeModal(){document.getElementById('modalBg').classList.remove('show')}
+
+function renderContracts(){
+  const list=store.contracts[curStation]||[];
+  let html='';
+  list.forEach((c,i)=>{
+    const signBadge=c.sign==='signed'?'badge-ok':c.sign==='draft'?'badge-warn':'badge-err';
+    const payBadge=c.pay==='paid'?'badge-ok':'badge-err';
+    const signText=c.sign==='signed'?'已签署':c.sign==='draft'?'已定稿':'未签署';
+    const payText=c.pay==='paid'?'已到款':'未到款';
+    html+=`<div style="padding:10px;border-bottom:1px solid #f0f0f0"><div style="display:flex;justify-content:space-between;align-items:center"><b>${c.name}</b><span style="font-weight:600;color:var(--p)">${c.amt}万</span></div><div style="font-size:12px;color:var(--t2);margin-top:4px">${c.type} · <span class="badge ${signBadge}">${signText}</span> <span class="badge ${payBadge}">${payText}</span></div></div>`;
+  });
+  document.getElementById('contractList').innerHTML=html||'<div class="empty">暂无合同记录</div>';
+  let totalAmt=0,totalPaid=0;
+  list.forEach(c=>{totalAmt+=c.amt;if(c.pay==='paid')totalPaid+=c.amt});
+  document.getElementById('contractStats').innerHTML=`
+    <div class="stat"><div class="v">${totalAmt}万</div><div class="l">签约总额</div></div>
+    <div class="stat ok"><div class="v">${totalPaid}万</div><div class="l">到款总额</div></div>
+    <div class="stat err"><div class="v">${totalAmt-totalPaid}万</div><div class="l">应收未收</div></div>
+    <div class="stat warn"><div class="v">${totalAmt?Math.round(totalPaid/totalAmt*100):0}%</div><div class="l">到款率</div></div>`;
+}
+function addContract(){
+  const name=document.getElementById('cName').value.trim();
+  const amt=+document.getElementById('cAmt').value||0;
+  if(!name||!amt){toast('请填写合作方和金额');return}
+  if(!store.contracts[curStation]) store.contracts[curStation]=[];
+  store.contracts[curStation].push({name,type:document.getElementById('cType').value,amt,sign:document.getElementById('cSign').value,pay:document.getElementById('cPay').value,time:new Date().toLocaleString('zh-CN')});
+  save();document.getElementById('cName').value='';document.getElementById('cAmt').value='';renderContracts();toast('合同已添加');
+}
+
+// ===== 登录认证 =====
+const AUTH = {
+  users: {
+    '小杨': {pass: '18101117007', role: 'admin', name: '小杨'},
+    'leader': {pass: 'view2026', role: 'viewer', name: '领导查看'}
+  },
+  currentUser: null
+};
+
+function doLogin(){
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginError');
+  
+  if(!user || !pass){
+    errEl.textContent = '请输入账号和密码';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  const auth = AUTH.users[user];
+  if(!auth || auth.pass !== pass){
+    errEl.textContent = '账号或密码错误';
+    errEl.style.display = 'block';
+    return;
+  }
+  
+  AUTH.currentUser = {user, ...auth};
+  localStorage.setItem('tubu_auth', JSON.stringify(AUTH.currentUser));
+  
+  document.getElementById('loginPage').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('userInfo').textContent = auth.name;
+  
+  initStore();
+  populateStationSelector();
+  renderHome();
+  
+  if(auth.role === 'viewer'){
+    disableEditing();
+  }
+}
+
+function showLeaderView(){
+  document.getElementById('loginUser').value = 'leader';
+  document.getElementById('loginPass').value = 'view2026';
+  doLogin();
+}
+
+function disableEditing(){
+  // 隐藏编辑按钮，只保留查看
+  document.querySelectorAll('.btn-primary, .btn-ok, .btn-err, .btn-warn').forEach(b => {
+    if(b.textContent.includes('保存') || b.textContent.includes('提交') || b.textContent.includes('添加')){
+      b.style.display = 'none';
+    }
+  });
+  // 禁用所有输入框，但保留站点选择器可用（让领导可以切换查看往期数据）
+  document.querySelectorAll('input, textarea').forEach(el => {
+    if(el.id !== 'stationSel') el.disabled = true;
+  });
+  // 隐藏"新增站点"选项
+  const sel = document.getElementById('stationSel');
+  const newOpt = sel.querySelector('option[value="new"]');
+  if(newOpt) newOpt.style.display = 'none';
+  // 隐藏编辑类标签页（现场、数据），保留首页/筹备/评分/合同查看
+  document.querySelectorAll('.bn-item').forEach(item => {
+    if(item.dataset.page === 'live' || item.dataset.page === 'data'){
+      item.style.display = 'none';
+    }
+  });
+}
+
+function logout(){
+  localStorage.removeItem('tubu_auth');
+  location.reload();
+}
+
+// 检查登录状态（支持URL参数自动登录）
+window.addEventListener('DOMContentLoaded', () => {
+  // 优先检查URL参数自动登录（扫码进入）
+  const params = new URLSearchParams(window.location.search);
+  const autoUser = params.get('user');
+  const autoPass = params.get('pass');
+  
+  if(autoUser && autoPass){
+    const auth = AUTH.users[autoUser];
+    if(auth && auth.pass === autoPass){
+      AUTH.currentUser = {user: autoUser, ...auth};
+      localStorage.setItem('tubu_auth', JSON.stringify(AUTH.currentUser));
+      // 清除URL中的密码参数，避免泄露
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }
+  
+  const saved = localStorage.getItem('tubu_auth');
+  if(saved && !AUTH.currentUser){
+    try{
+      AUTH.currentUser = JSON.parse(saved);
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'block';
+      document.getElementById('userInfo').textContent = AUTH.currentUser.name;
+      initStore();
+      populateStationSelector();
+      renderHome();
+      if(AUTH.currentUser.role === 'viewer'){
+        disableEditing();
+      }
+    }catch(e){
+      localStorage.removeItem('tubu_auth');
+    }
+  }
+});
+
+</script>
+</body>
+</html>
