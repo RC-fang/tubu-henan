@@ -528,7 +528,117 @@ const COMPANIES = {
 ]
 };
 
-const DATA_VERSION = 3; // 数据版本号，每次HIST更新时递增，强制同步
+// ===== 企业工商信息数据库（网上查询） =====
+// tier: 1=大型企业 2=中型企业 3=小型企业 4=微型企业/个体 5=非遗手工
+const CI={
+// ---- 大型/知名品牌 ----
+'白象养优鲜':{l:'姚忠良',a:'郑州新郑市',c:1000,e:'~50人(子公司)',t:1,d:'白象食品集团旗下，母公司注册资本3.5亿，员工10000+'},
+'洛阳杜康':{l:'武小岭',a:'洛阳市洛龙区',c:60000,e:'控股公司',t:1,d:'洛阳杜康控股，外商独资，旗下杜康酒业1.458亿资本'},
+'河南米多奇食品有限公司':{l:'牛利宾',a:'辉县市',c:8000,e:'5000+(集团)',t:1,d:'年产值20亿，全国米饼/馍片领导品牌'},
+'甘源食品(安阳)':{l:'严斌生',a:'汤阴县',c:5000,e:'465人',t:2,d:'A股上市公司甘源食品(002991)全资子公司，母公司~3000人'},
+'今麦郎饮品(汤阴)':{l:'陈成军',a:'汤阴县',c:16000,e:'116人',t:2,d:'今麦郎饮品股份100%控股，全国知名饮品品牌'},
+'益海嘉里(安阳)':{l:'王煜霞',a:'汤阴县',c:17000,e:'201人',t:2,d:'益海嘉里金龙鱼(300999)80%控股，注册资本2400万美元'},
+'河南嘉士利食品':{l:'卫少辉',a:'汤阴县',c:5000,e:'300人',t:2,d:'广东嘉士利集团100%控股，中国饼干知名品牌'},
+'河南邦尼生物工程有限公司':{l:'王威',a:'新乡高新区',c:3000,e:'~142人',t:2,d:'专精特新"小巨人"企业，高新技术企业，169商标348专利'},
+'河南红旗渠饮品':{l:'郭文强',a:'林州市',c:60000,e:'39人(集团本体)',t:2,d:'河南红旗渠集团(国企)旗下，集团注册资本6亿，营收5.05亿，42家子公司'},
+'杜康控股':{l:'武小岭',a:'洛阳市洛龙区',c:60000,e:'控股公司',t:1,d:'洛阳杜康控股，外商独资，旗下杜康酒业1.458亿资本'},
+'智慧健康科技有限公司':{l:'赵杰',a:'开曼(大陆运营深圳)',c:0,e:'~52人',t:3,d:'港股HK.01715，厨房用具制造贸易，微型上市公司'},
+'中食民安控股有限公司':{l:'王雷',a:'开曼(运营新加坡)',c:0,e:'~139人',t:3,d:'港股HK.08283，食品及厨电，总市值~1.4亿港元'},
+'长儒集团有限公司':{l:'黄延辉',a:'广州番禺',c:6000,e:'控股公司',t:3,d:'控股9家企业，涉及环保/生物科技，部分关联公司已吊销'},
+// ---- 中型企业 ----
+'河南红旗渠(集团)':{l:'郭文强',a:'林州市',c:60000,e:'39人',t:2,d:'大型国企，林州财通80%控股，营收5.05亿'},
+'林州红旗渠酒业':{l:'蔡彦周',a:'林州市五龙镇',c:5000,e:'16人',t:3,d:'河南中房威泰100%控股，白酒制造'},
+'河南豫园红汇生物科技有限公司':{l:'阮清雨',a:'辉县市沙窑乡',c:3000,e:'4人',t:4,d:'山楂制品，14商标1专利，实缴仅28万'},
+'河南九龙食品有限公司':{l:'张建省',a:'新乡原阳县',c:1000,e:'18人',t:3,d:'花生/芝麻/杂粮，年营收3171万(2023)'},
+'安阳鼎芝食品':{l:'朱红涛',a:'汤阴县伏道镇',c:3000,e:'50-150人',t:3,d:'日产60+吨芝麻制品，年营收~7000万，出口多国'},
+'安阳兴厨调味':{l:'柴林杰',a:'汤阴县',c:500,e:'200+人',t:2,d:'年产值过亿，省著名商标，连续多年A级纳税人'},
+'林州市太行益友菊品':{l:'郭亮',a:'林州市茶店镇',c:600,e:'300+人',t:2,d:'800亩菊花基地，产品远销意大利、德国'},
+'河南楂之恋食品有限公司':{l:'赵山山',a:'辉县市产业集聚区',c:225,e:'小微',t:4,d:'冻干山楂，43商标，科技型中小企业'},
+'河南礼遇共城企业管理有限公司':{l:'李素芳',a:'辉县市',c:500,e:'新成立',t:4,d:'2024年10月新设，小麦胚芽/玉米金汤'},
+'河南源香食品':{l:'陈自然',a:'汤阴县城关镇',c:6900,e:'214人',t:2,d:'200亩基地，四地生产，肉肠/调理/火锅/休闲食品'},
+'河南新东方食品':{l:'康现娣',a:'汤阴县产业集聚区',c:1000,e:'200+人',t:2,d:'年营收2.3亿，固定资产1.8亿，省农业产业化重点龙头'},
+'滑县道口画宝刚烧鸡':{l:'王彦良',a:'安阳滑县',c:500,e:'113人',t:3,d:'中华老字号，1956年创立，28商标19专利'},
+'南阳道地金木瓜生物科技股份有限公司':{l:'熊端成',a:'方城县',c:1200,e:'待查',t:3,d:'省农业产业化重点龙头企业，7万亩木瓜基地'},
+'河南荟萃云山农业科技有限公司':{l:'宋长松',a:'方城县',c:6000,e:'极少',t:3,d:'注册资本6000万，裕丹参等中药材种植'},
+'河南皖北药业':{l:'李洪国',a:'方城县广阳镇',c:100,e:'小微',t:4,d:'非遗传承人企业，益母膏'},
+'薯品汇食品科技（河南）股份有限公司':{l:'吕凤清',a:'方城县小史店镇',c:500,e:'待查',t:4,d:'科技型中小企业，31个商标'},
+'河南宛宝制药有限公司':{l:'郑白杨',a:'方城县产业集聚区',c:500,e:'~30人',t:3,d:'高新技术企业，专精特新，在建项目7.7亿'},
+'玉薯坊农业科技有限公司':{l:'待查',a:'方城县',c:300,e:'待查',t:4,d:'酸辣粉/红薯三粉'},
+'林州市红旗渠文化创意有限公司':{l:'张书浩',a:'林州市',c:100,e:'小微',t:4,d:'红旗渠集团(国企)子公司'},
+'林州市众禾思食品':{l:'王张红',a:'林州市姚村镇',c:300,e:'0人参保',t:4,d:'2024年新成立'},
+'安阳市诺金食品':{l:'付海峰',a:'汤阴县',c:50,e:'16-18人',t:4,d:'曾为省农业产业化重点龙头，A级纳税人，3.5万㎡'},
+'安阳市豆香村食品':{l:'晁佳然',a:'汤阴县',c:100,e:'小微',t:4,d:'豆制品生产'},
+'安阳钙瑞益健':{l:'张青娥',a:'安阳市龙安区',c:500,e:'小微',t:4,d:'科技型中小企业，25商标8专利'},
+'河南杞乐生物科技有限公司':{l:'李红卫',a:'驻马店经济开发区',c:100,e:'50人',t:3,d:'高新技术企业，精油纯露3000吨/年，70商标19专利'},
+'中部聚农食品科技有限公司':{l:'待查',a:'辉县市',c:500,e:'待查',t:4,d:'食品加工'},
+'鹤壁市钜亿农业科技发展有限公司':{l:'待查',a:'鹤壁市淇滨区钜桥镇',c:0,e:'小型',t:4,d:'鲜食玉米/即食马蹄，2026年新获食品生产许可'},
+'河南华淼农业开发有限公司':{l:'张国峰',a:'鹤壁市淇滨区钜桥镇',c:1200,e:'中型',t:3,d:'5000余亩芦笋基地，年产值3亿(深加工)'},
+'艾博生态园':{l:'待查',a:'鹤壁市',c:300,e:'待查',t:4,d:'生态农产品'},
+'洛阳市霖达食品':{l:'周正',a:'洛阳市汝阳县',c:50,e:'小微',t:4,d:'科技型中小企业(2024)，食品生产/互联网销售'},
+'河南省飞瑞农业科技有限公司':{l:'待查',a:'洛阳市',c:300,e:'待查',t:4,d:'农产品'},
+'方城县瑞达牧业有限公司':{l:'待查',a:'方城县',c:300,e:'待查',t:4,d:'禽蛋产品'},
+'方城县正兴艾制品有限公司':{l:'待查',a:'方城县',c:200,e:'待查',t:4,d:'艾垫/艾叶茶'},
+'内黄县枣乡情':{l:'待查',a:'内黄县',c:200,e:'待查',t:4,d:'枣产品'},
+'林州市东姚洪河米业':{l:'待查',a:'林州市',c:300,e:'待查',t:4,d:'米业'},
+'林州市奥晨牧业':{l:'待查',a:'林州市',c:300,e:'待查',t:4,d:'牧业'},
+'旺成食品·樂神康':{l:'待查',a:'方城县',c:200,e:'待查',t:4,d:'东方本草植物汽水'},
+'山李人饺子食品有限公司':{l:'待查',a:'方城县',c:200,e:'待查',t:4,d:'手工山野菜饺子'},
+'方城县众望农业科技有限公司':{l:'待查',a:'方城县',c:200,e:'待查',t:4,d:'菊花系列产品'},
+'方城县鹏迈农牧':{l:'待查',a:'方城县',c:200,e:'待查',t:4,d:'农牧'},
+'中恒科（方城县）农业发展中心':{l:'待查',a:'方城县',c:300,e:'待查',t:4,d:'玄参/白芍系列'},
+'鸿宇农业科技':{l:'待查',a:'方城县',c:100,e:'待查',t:4,d:'农业科技'},
+'林州市石板岩供销社':{l:'待查',a:'林州市',c:100,e:'待查',t:4,d:'综合'},
+'张官营种植养殖':{l:'待查',a:'林州市',c:100,e:'待查',t:4,d:'种养殖'},
+'林州市一亩地种养殖':{l:'待查',a:'林州市',c:200,e:'待查',t:4,d:'种养殖'},
+'林州市林虑山农业发展':{l:'待查',a:'林州市',c:200,e:'待查',t:4,d:'农产品'},
+'林州市名优农副产品':{l:'待查',a:'林州市',c:100,e:'待查',t:4,d:'农副产品'},
+'林州市亲情农庄':{l:'待查',a:'林州市',c:100,e:'待查',t:4,d:'农产品'},
+'林州市桂林镇古善村':{l:'待查',a:'林州市',c:100,e:'待查',t:4,d:'艾条'},
+'方城县高峰养蚕专业合作社':{l:'待查',a:'方城县',c:100,e:'待查',t:4,d:'桑蚕产品'},
+'方城县丽康家庭农场':{l:'待查',a:'方城县',c:100,e:'待查',t:4,d:'黄金梨及系列'},
+'万盛源食品':{l:'丁金玲',a:'汤阴县宜沟镇',c:20,e:'小微',t:4,d:'手工空心挂面，2025年减资至20万'},
+'部落生态农庄':{l:'待查',a:'汤阴县',c:200,e:'待查',t:4,d:'生态农产品'},
+'恒翔农业':{l:'待查',a:'汤阴县',c:200,e:'待查',t:4,d:'农业'},
+'汤阴县硕果园':{l:'王新红',a:'汤阴县古贤乡',c:560,e:'待查',t:4,d:'果蔬种植，A级纳税人(2022)'},
+'安阳华原种养':{l:'待查',a:'安阳市',c:200,e:'待查',t:4,d:'种养'},
+'汝阳县同富粉条专业合作社':{l:'待查',a:'汝阳县',c:100,e:'待查',t:4,d:'粉条'},
+'洛阳孟洗农业':{l:'待查',a:'洛阳市',c:200,e:'待查',t:4,d:'农产品'},
+'汝阳县家昌种植':{l:'李二寨',a:'汝阳县',c:800,e:'待查',t:4,d:'种植专业合作社'},
+'洛阳百蔬香':{l:'卢磊刚',a:'洛阳市',c:880,e:'待查',t:3,d:'洛阳市农业产业化市级重点龙头企业(2025)'},
+'汝阳县汝香香':{l:'张颜召',a:'汝阳县十八盘乡',c:0,e:'个体户',t:4,d:'食用菌种植园，关联汝香源农业科技(1000万)'},
+'鹤壁航田科技有限公司':{l:'待查',a:'鹤壁市',c:300,e:'待查',t:4,d:'农业科技'},
+'盛禾种植':{l:'待查',a:'鹤壁市',c:100,e:'待查',t:4,d:'种植'},
+'河南万祥园牧业':{l:'待查',a:'鹤壁市',c:200,e:'待查',t:4,d:'牧业'}
+};
+// 非遗/手工类统一标注
+['金属浮雕锻造','艺俸斋制香','吕氏雕刻','黄河古陶','鲍氏针灸','辉县剪纸','传拓技艺','辉县窑烧瓷','共城泥塑','太行石雕','糖画','草编','郭氏正骨','织韵绳艺','岐山堂石磨香油','张师傅米雕','烙画','剪纸','布艺','方石石猴','黄石砚','博望军有锅盔','张氏艾制品','曹氏面人糖人','货郎担','方城糖画','中望甜面酱','裴氏刺绣','芝元堂膏剂茶饮','大乘山酒','黄石公酒厂','侯记锅盔','兆民食品','方城梳篦','汤阴有礼/易乡古韵','黄河陶塑'].forEach(n=>{if(!CI[n])CI[n]={l:'-',a:'-',c:0,e:'-',t:5,d:'非遗传承/手工技艺'}});
+
+// 体量等级标签
+const TIER_LABELS={1:'大型企业',2:'中型企业',3:'小型企业',4:'微型企业',5:'非遗手工'};
+const TIER_COLORS={1:'#ea4335',2:'#fbbc04',3:'#34a853',4:'#5f6368',5:'#9c27b0'};
+
+// 按体量排序的企业列表（去重后）
+function getRankedCompanies(){
+  const unique={};
+  for(let s in COMPANIES){
+    COMPANIES[s].forEach((c,i)=>{
+      if(!unique[c.n]) unique[c.n]={data:c,stations:[],totalSales:0};
+      unique[c.n].stations.push(+s);
+      unique[c.n].totalSales+=c.s;
+    });
+  }
+  const list=Object.values(unique);
+  list.sort((a,b)=>{
+    const ia=CI[a.data.n]||{}, ib=CI[b.data.n]||{};
+    const ta=ia.t||4, tb=ib.t||4;
+    if(ta!==tb) return ta-tb;
+    // 同tier按注册资本降序
+    return (ib.c||0)-(ia.c||0);
+  });
+  return list;
+}
+
+const DATA_VERSION = 4; // 数据版本号，COMPANY_INFO更新时递增
 let curStation = 9;
 let store = JSON.parse(localStorage.getItem('tubu_workbench')||'{}');
 function initStore(){
@@ -1071,6 +1181,43 @@ function renderMerchantOverview(){
   html+='<div class="stat warn"><div class="v">'+allSales.reduce((a,b)=>a+b.sales,0).toLocaleString()+'</div><div class="l">总销售额(元)</div></div>';
   html+='</div>';
 
+  // Tier distribution
+  const tierCounts={1:0,2:0,3:0,4:0,5:0};
+  const uniqueNames=new Set();
+  for(let s in COMPANIES) COMPANIES[s].forEach(c=>{
+    if(!uniqueNames.has(c.n)){
+      uniqueNames.add(c.n);
+      const info=CI[c.n]||{};
+      const t=info.t||4;
+      tierCounts[t]=(tierCounts[t]||0)+1;
+    }
+  });
+  html+='<div class="card"><div class="card-title">企业体量分布</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;text-align:center">';
+  for(let t=1;t<=5;t++){
+    html+='<div style="padding:8px 4px;background:'+TIER_COLORS[t]+'10;border-radius:8px;border:1px solid '+TIER_COLORS[t]+'30">';
+    html+='<div style="font-size:18px;font-weight:700;color:'+TIER_COLORS[t]+'">'+tierCounts[t]+'</div>';
+    html+='<div style="font-size:10px;color:'+TIER_COLORS[t]+'">'+TIER_LABELS[t]+'</div>';
+    html+='</div>';
+  }
+  html+='</div></div>';
+
+  // Top enterprises by tier
+  const ranked=getRankedCompanies();
+  const topEnterprises=ranked.filter(c=>(CI[c.data.n]||{}).t<=2).slice(0,10);
+  if(topEnterprises.length){
+    html+='<div class="card"><div class="card-title">优质企业TOP10 <span style="font-size:11px;color:var(--t2);font-weight:normal">(按体量排序)</span></div>';
+    topEnterprises.forEach((c,i)=>{
+      const info=CI[c.data.n]||{};
+      html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px;border-bottom:1px solid #f0f0f0">';
+      html+='<span><b style="color:var(--p)">'+(i+1)+'</b> '+c.data.n;
+      html+=' <span style="font-size:10px;padding:1px 6px;border-radius:8px;background:'+TIER_COLORS[info.t]+'15;color:'+TIER_COLORS[info.t]+'">'+TIER_LABELS[info.t]+'</span></span>';
+      if(info.e&&info.e!=='-') html+='<span style="font-size:11px;color:var(--t2)">'+info.e+'</span>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+
   html+='<div class="card"><div class="card-title">各站参展企业数</div>';
   html+='<table><tr><th>站次</th><th>站点</th><th>企业数</th></tr>';
   stationCounts.forEach(s=>{
@@ -1112,13 +1259,23 @@ function renderMerchantBrands(){
 
 function showStationBrands(stationNum){
   const comps=COMPANIES[stationNum]||[];
-  let html='<div style="font-size:13px;color:var(--t2);margin-bottom:8px">第'+stationNum+'站·'+HIST[stationNum].name+' — 共'+comps.length+'家参展企业</div>';
-  comps.forEach((c,i)=>{
+  // Sort by tier within station view
+  const sorted=[...comps].sort((a,b)=>{
+    const ia=CI[a.n]||{}, ib=CI[b.n]||{};
+    const ta=ia.t||4, tb=ib.t||4;
+    if(ta!==tb) return ta-tb;
+    return (ib.c||0)-(ia.c||0);
+  });
+  let html='<div style="font-size:13px;color:var(--t2);margin-bottom:8px">第'+stationNum+'站·'+HIST[stationNum].name+' — 共'+comps.length+'家参展企业（按体量排序）</div>';
+  sorted.forEach((c,i)=>{
+    const info=CI[c.n]||{};
     const catClass=c.c==='非遗'?'badge-warn':c.c==='食品'?'badge-ok':c.c==='农业'?'badge-blue':'badge-blue';
     html+='<div style="padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="showCompanyDetail(\''+c.n.replace(/'/g,"\\'")+'\')">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center">';
     html+='<div style="flex:1"><b style="font-size:14px">'+c.n+'</b>';
-    html+=' <span class="badge '+catClass+'">'+c.c+'</span></div>';
+    html+=' <span class="badge '+catClass+'">'+c.c+'</span>';
+    if(info.t&&info.t<=3) html+=' <span style="font-size:10px;padding:1px 6px;border-radius:8px;background:'+TIER_COLORS[info.t]+'15;color:'+TIER_COLORS[info.t]+'">'+TIER_LABELS[info.t]+'</span>';
+    html+='</div>';
     if(c.s>0) html+='<span style="font-weight:600;color:var(--ok)">'+c.s.toLocaleString()+'元</span>';
     html+='</div>';
     html+='<div style="font-size:12px;color:var(--t2);margin-top:4px">'+c.p+(c.f?' · '+c.f:'')+'</div>';
@@ -1151,12 +1308,19 @@ function showCompanyDetail(name){
     }
   }
   if(!compData) return;
+  const info=CI[compData.n]||{};
   let html='<h3>'+compData.n+'</h3>';
   html+='<div style="margin-bottom:10px"><span class="badge badge-blue">'+compData.c+'</span>';
+  if(info.t) html+=' <span class="badge" style="background:'+TIER_COLORS[info.t]+'20;color:'+TIER_COLORS[info.t]+'">'+TIER_LABELS[info.t]+'</span>';
   if(stations.length>1) html+=' <span class="badge badge-warn">参展'+stations.length+'站</span>';
   html+='</div>';
   html+='<div style="font-size:14px;line-height:2">';
   html+='<b>产品：</b>'+compData.p+'<br>';
+  if(info.l&&info.l!=='-') html+='<b>法人：</b>'+info.l+'<br>';
+  if(info.a&&info.a!=='-') html+='<b>注册地：</b>'+info.a+'<br>';
+  if(info.c>0) html+='<b>注册资本：</b>'+(info.c>=10000?(info.c/10000).toFixed(1)+'亿元':info.c+'万元')+'<br>';
+  if(info.e&&info.e!=='-') html+='<b>企业规模：</b>'+info.e+'<br>';
+  if(info.d) html+='<b>企业简介：</b><span style="color:var(--t2)">'+info.d+'</span><br>';
   html+='<b>参展站点：</b>'+stations.map(s=>s.name).join('、')+'<br>';
   html+='<b>销售额：</b><span style="color:var(--ok);font-weight:600">'+totalSales.toLocaleString()+'元</span><br>';
   if(allFeedback.length) html+='<b>反馈：</b>'+allFeedback.join('；')+'<br>';
@@ -1203,17 +1367,34 @@ function filterPool(){
   if(search) list=list.filter(c=>c.data.n.toLowerCase().includes(search));
   if(curCat!=='all') list=list.filter(c=>c.data.c===curCat);
 
-  let html='<div style="font-size:12px;color:var(--t2);margin-bottom:8px">共'+list.length+'家企业</div>';
+  // Sort by tier (1=largest first), then by registered capital
+  list.sort((a,b)=>{
+    const ia=CI[a.data.n]||{}, ib=CI[b.data.n]||{};
+    const ta=ia.t||4, tb=ib.t||4;
+    if(ta!==tb) return ta-tb;
+    return (ib.c||0)-(ia.c||0);
+  });
+
+  let html='<div style="font-size:12px;color:var(--t2);margin-bottom:8px">共'+list.length+'家企业 · 按体量从大到小排序</div>';
+  let lastTier=0;
   list.forEach(c=>{
+    const info=CI[c.data.n]||{};
+    const tier=info.t||4;
+    // Tier separator
+    if(tier!==lastTier&&tier<=4){
+      html+='<div style="padding:6px 10px;background:'+TIER_COLORS[tier]+'10;font-size:12px;font-weight:600;color:'+TIER_COLORS[tier]+';margin-top:4px;border-radius:6px">'+TIER_LABELS[tier]+'</div>';
+      lastTier=tier;
+    }
     const catClass=c.data.c==='非遗'?'badge-warn':c.data.c==='食品'?'badge-ok':'badge-blue';
     html+='<div style="padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="showCompanyDetail(\''+c.data.n.replace(/'/g,"\\'")+'\')">';
     html+='<div style="display:flex;justify-content:space-between;align-items:center">';
     html+='<div><b>'+c.data.n+'</b> <span class="badge '+catClass+'">'+c.data.c+'</span>';
+    if(info.e&&info.e!=='-'&&info.e!=='小微'&&info.e!=='小型'&&info.e!=='待查'&&info.e!=='个体户') html+=' <span style="font-size:11px;color:var(--t2)">'+info.e+'</span>';
     if(c.stations.length>1) html+=' <span class="badge badge-warn">参展'+c.stations.length+'站</span>';
     html+='</div>';
     if(c.totalSales>0) html+='<span style="font-weight:600;color:var(--ok);font-size:13px">'+c.totalSales.toLocaleString()+'元</span>';
     html+='</div>';
-    html+='<div style="font-size:12px;color:var(--t2);margin-top:4px">'+c.data.p+'</div>';
+    html+='<div style="font-size:12px;color:var(--t2);margin-top:4px">'+c.data.p+(info.l&&info.l!=='-'?' · 法人: '+info.l:'')+'</div>';
     html+='</div>';
   });
   document.getElementById('poolList').innerHTML=html;
