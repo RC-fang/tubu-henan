@@ -528,11 +528,23 @@ const COMPANIES = {
 ]
 };
 
+const DATA_VERSION = 3; // 数据版本号，每次HIST更新时递增，强制同步
 let curStation = 9;
 let store = JSON.parse(localStorage.getItem('tubu_workbench')||'{}');
 function initStore(){
-  if(!store.stations) store.stations = JSON.parse(JSON.stringify(HIST));
-  // 迁移：补全旧数据缺失的boothSales字段
+  const oldVer = store._ver || 0;
+  if(!store.stations || oldVer < DATA_VERSION){
+    // 版本升级：以HIST为基准重建，保留用户手动修改的非HIST数据
+    const oldStations = store.stations || {};
+    store.stations = JSON.parse(JSON.stringify(HIST));
+    // 保留用户新增的站点（编号>8的）
+    for(let k in oldStations){
+      const kn = parseInt(k);
+      if(kn > 8 && !store.stations[kn]) store.stations[kn] = oldStations[kn];
+    }
+    store._ver = DATA_VERSION;
+  }
+  // 迁移：补全旧数据缺失的字段
   for(let k in store.stations){
     if(store.stations[k].boothSales===undefined) store.stations[k].boothSales=HIST[k]?.boothSales||0;
     if(store.stations[k].booth===undefined) store.stations[k].booth=HIST[k]?.booth||0;
