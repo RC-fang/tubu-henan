@@ -163,7 +163,7 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 <div class="chart-box"><canvas id="chartHome"></canvas></div>
 </div>
 <div class="card">
-<div class="card-title">第${curStation}站 · 往期展品 <span style="font-size:12px;color:var(--t2);font-weight:400" id="productsLabel"></span></div>
+<div class="card-title"><span id="productsTitle">往期展品</span> <span style="font-size:12px;color:var(--t2);font-weight:400" id="productsLabel"></span></div>
 <div id="stationProducts"></div>
 </div>
 <div class="card">
@@ -807,6 +807,7 @@ function renderHome(){
     <div class="progress"><div class="progress-fill" style="width:${prog.pct}%"></div></div>`;
 
   // Station products
+  document.getElementById('productsTitle').textContent = '第'+curStation+'站 · 往期展品';
   const products = STATION_PRODUCTS[curStation] || [];
   document.getElementById('productsLabel').textContent = products.length ? '('+products.length+'类)' : '';
   document.getElementById('stationProducts').innerHTML = products.length
@@ -821,7 +822,7 @@ function renderHome(){
   tierHtml += '</div>';
   document.getElementById('sponsorTiers').innerHTML = tierHtml;
 
-  renderHomeChart();
+  requestAnimationFrame(renderHomeChart);
 }
 
 function renderHomeChart(){
@@ -830,10 +831,11 @@ function renderHomeChart(){
   const container=canvas.parentElement;
   const w=container.clientWidth-20;
   const h=260;
+  if(w<50) return; // container not ready yet
   canvas.width=w*2;canvas.height=h*2;
   canvas.style.width=w+'px';canvas.style.height=h+'px';
   const ctx=canvas.getContext('2d');
-  ctx.scale(2,2);
+  ctx.setTransform(2,0,0,2,0,0); // use setTransform instead of scale to avoid compounding
   ctx.clearRect(0,0,w,h);
 
   // Collect data for all stations
@@ -1077,7 +1079,7 @@ function renderMedia(){
     '· 短视频平台累计播放超600万次<br>'+
     '· 覆盖全省10余个地市、50余个县区';
 
-  renderMediaChart();
+  requestAnimationFrame(renderMediaChart);
 }
 
 function renderMediaChart(){
@@ -1086,10 +1088,11 @@ function renderMediaChart(){
   const container=canvas.parentElement;
   const w=container.clientWidth-20;
   const h=260;
+  if(w<50) return;
   canvas.width=w*2;canvas.height=h*2;
   canvas.style.width=w+'px';canvas.style.height=h+'px';
   const ctx=canvas.getContext('2d');
-  ctx.scale(2,2);
+  ctx.setTransform(2,0,0,2,0,0);
   ctx.clearRect(0,0,w,h);
 
   const data=[];
