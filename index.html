@@ -13,9 +13,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei
 .top .station-sel{background:rgba(255,255,255,.2);border:none;color:#fff;padding:6px 12px;border-radius:20px;font-size:13px;cursor:pointer}
 .top .station-sel option{color:#333}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--bd);display:flex;z-index:100;padding:4px 0 env(safe-area-inset-bottom,4px)}
-.bn-item{flex:1;text-align:center;padding:8px 4px;cursor:pointer;font-size:11px;color:var(--t2);transition:all .2s}
+.bn-item{flex:1;text-align:center;padding:8px 2px;cursor:pointer;font-size:10px;color:var(--t2);transition:all .2s}
 .bn-item.active{color:var(--p)}
-.bn-item .icon{font-size:22px;display:block;margin-bottom:2px}
+.bn-item .icon{font-size:20px;display:block;margin-bottom:2px}
 .page{display:none;padding:12px}
 .page.active{display:block}
 .card{background:var(--card);border-radius:var(--r);padding:14px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
@@ -79,6 +79,8 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 .empty{text-align:center;padding:30px;color:var(--t2)}
 .progress{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-top:4px}
 .progress-fill{height:100%;background:var(--p);border-radius:3px;transition:width .3s}
+.merchant-tab{border-radius:20px;white-space:nowrap}
+.merchant-tab.active{background:var(--p);color:#fff}
 @media(min-width:768px){.stats{grid-template-columns:repeat(4,1fr)}.page{max-width:720px;margin:0 auto}.chart-box{height:300px}}
 </style>
 </head>
@@ -132,8 +134,13 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 </div>
 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
 <div><div style="font-size:18px;font-weight:600" id="totalArticles">0</div><div style="font-size:11px;opacity:.8">总发稿</div></div>
-<div><div style="font-size:18px;font-weight:600" id="totalReads">0</div><div style="font-size:11px;opacity:.8">总阅读(万)</div></div>
+<div><div style="font-size:18px;font-weight:600" id="totalReads">0</div><div style="font-size:11px;opacity:.8">新华网阅读(万)</div></div>
 <div><div style="font-size:18px;font-weight:600" id="totalStations">0</div><div style="font-size:11px;opacity:.8">已办场次</div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+<div><div style="font-size:16px;font-weight:600" id="totalNetworkReads">0</div><div style="font-size:11px;opacity:.8">全网阅读(万)</div></div>
+<div><div style="font-size:16px;font-weight:600" id="totalNetworkReadsYi">0</div><div style="font-size:11px;opacity:.8">全网阅读(亿)</div></div>
+<div><div style="font-size:16px;font-weight:600" id="totalMediaHits">0</div><div style="font-size:11px;opacity:.8">首发及转载</div></div>
 </div>
 <div style="border-top:1px solid rgba(255,255,255,.2);padding-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:10px">
 <div><div style="font-size:16px;font-weight:600" id="totalContract">0</div><div style="font-size:11px;opacity:.8">总签约(万)</div></div>
@@ -280,8 +287,42 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 </div>
 </div>
 
-<!-- ===== 合同 ===== -->
-<div class="page" id="pg-contract">
+<!-- ===== 传播 ===== -->
+<div class="page" id="pg-media">
+<div class="card" style="background:linear-gradient(135deg,#34a853,#0d7a3e);color:#fff;margin-bottom:16px">
+<div style="font-size:13px;opacity:.9;margin-bottom:8px">八站全网传播总览</div>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:12px">
+<div><div style="font-size:28px;font-weight:700">2.002</div><div style="font-size:11px;opacity:.8">全网阅读量(亿次)</div></div>
+<div><div style="font-size:28px;font-weight:700">20,020</div><div style="font-size:11px;opacity:.8">首发及转载(次)</div></div>
+</div>
+<div style="border-top:1px solid rgba(255,255,255,.2);padding-top:10px;font-size:12px;opacity:.8" id="mediaOtherMetrics"></div>
+</div>
+<div class="card">
+<div class="card-title">各站全网传播明细</div>
+<table><tr><th>站次</th><th>站点</th><th>日期</th><th>首发/转载</th><th>阅读量(万)</th><th>占比</th></tr><tbody id="mediaTable"></tbody></table>
+</div>
+<div class="card">
+<div class="card-title">传播趋势</div>
+<div class="chart-box"><canvas id="chartMedia"></canvas></div>
+</div>
+<div class="card">
+<div class="card-title">新华网传播数据</div>
+<div style="font-size:13px;color:var(--t2);line-height:1.8" id="xinhuaMetrics"></div>
+</div>
+</div>
+
+<!-- ===== 招商 ===== -->
+<div class="page" id="pg-merchant">
+<div style="display:flex;gap:8px;margin-bottom:12px;overflow-x:auto" id="merchantTabs">
+<button class="btn btn-primary btn-sm merchant-tab active" onclick="switchMerchantTab('overview')">招商总览</button>
+<button class="btn btn-outline btn-sm merchant-tab" onclick="switchMerchantTab('brands')">参展品牌方</button>
+<button class="btn btn-outline btn-sm merchant-tab" onclick="switchMerchantTab('pool')">企业货盘</button>
+</div>
+<div id="merchantOverview"></div>
+<div id="merchantBrands" style="display:none"></div>
+<div id="merchantPool" style="display:none"></div>
+<!-- Keep contract section -->
+<div class="divider"></div>
 <div class="card">
 <div class="card-title">添加合同</div>
 <div class="form-group"><label>合作方名称</label><input type="text" id="cName" placeholder="如：七峰山景区"></div>
@@ -316,8 +357,9 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 <div class="bn-item" data-page="prep"><span class="icon">✅</span>筹备</div>
 <div class="bn-item" data-page="live"><span class="icon">📝</span>现场</div>
 <div class="bn-item" data-page="data"><span class="icon">📥</span>数据</div>
+<div class="bn-item" data-page="media"><span class="icon">📡</span>传播</div>
 <div class="bn-item" data-page="score"><span class="icon">⭐</span>评分</div>
-<div class="bn-item" data-page="contract"><span class="icon">💰</span>合同</div>
+<div class="bn-item" data-page="merchant"><span class="icon">🤝</span>招商</div>
 </div>
 
 <!-- 退出登录按钮 -->
@@ -329,36 +371,232 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 // ===== Data Store =====
 const STD_COST = 6; // 万元/场
 const HIST = {
-1:{name:'登封',date:'2026-04-11',reg:797,checkin:496,finish:404,articles:8,reads:820,booth:30,boothSales:230000,cost:11.92,contractAmt:0,paidAmt:0},
-2:{name:'光山',date:'2026-04-26',reg:822,checkin:534,finish:454,articles:8,reads:1000,booth:30,boothSales:100000,cost:9.48,contractAmt:0,paidAmt:0},
-3:{name:'汝阳',date:'2026-05-31',reg:1090,checkin:679,finish:557,articles:10,reads:2000,booth:30,boothSales:0,cost:7.93,contractAmt:0,paidAmt:0},
-4:{name:'淇滨',date:'2026-06-14',reg:910,checkin:531,finish:391,articles:8,reads:1000,booth:30,boothSales:0,cost:6.97,contractAmt:0,paidAmt:0},
-5:{name:'辉县',date:'2026-06-30',reg:600,checkin:331,finish:250,articles:4,reads:530.1,booth:30,boothSales:0,cost:8.55,contractAmt:0,paidAmt:0},
-6:{name:'汤阴',date:'2026-08-30',reg:797,checkin:584,finish:499,articles:7,reads:920,booth:30,boothSales:0,cost:7.85,contractAmt:0,paidAmt:0},
-7:{name:'林州',date:'2026-09-06',reg:600,checkin:362,finish:319,articles:8,reads:2100,booth:30,boothSales:0,cost:6.22,contractAmt:0,paidAmt:0},
-8:{name:'方城',date:'2026-10-01',reg:665,checkin:417,finish:325,articles:7,reads:1500,booth:31,boothSales:0,cost:6,contractAmt:0,paidAmt:0}
+1:{name:'登封',date:'2026-04-11',reg:797,checkin:496,finish:404,articles:8,reads:820,booth:30,boothSales:230000,cost:11.92,contractAmt:0,paidAmt:0,networkReads:1300},
+2:{name:'光山',date:'2026-04-26',reg:822,checkin:534,finish:454,articles:8,reads:1000,booth:30,boothSales:100000,cost:9.48,contractAmt:0,paidAmt:0,networkReads:1700},
+3:{name:'汝阳',date:'2026-05-31',reg:1090,checkin:679,finish:557,articles:10,reads:2000,booth:30,boothSales:0,cost:7.93,contractAmt:0,paidAmt:0,networkReads:9000},
+4:{name:'淇滨',date:'2026-06-14',reg:910,checkin:531,finish:391,articles:8,reads:1000,booth:30,boothSales:0,cost:6.97,contractAmt:0,paidAmt:0,networkReads:1300},
+5:{name:'辉县',date:'2026-06-30',reg:600,checkin:331,finish:250,articles:4,reads:530.1,booth:30,boothSales:0,cost:8.55,contractAmt:0,paidAmt:0,networkReads:1200},
+6:{name:'汤阴',date:'2026-08-30',reg:797,checkin:584,finish:499,articles:7,reads:920,booth:30,boothSales:0,cost:7.85,contractAmt:0,paidAmt:0,networkReads:1920},
+7:{name:'林州',date:'2026-09-06',reg:600,checkin:362,finish:319,articles:8,reads:2100,booth:30,boothSales:0,cost:6.22,contractAmt:0,paidAmt:0,networkReads:2100},
+8:{name:'方城',date:'2026-10-01',reg:665,checkin:417,finish:325,articles:7,reads:1500,booth:31,boothSales:0,cost:6,contractAmt:0,paidAmt:0,networkReads:1500}
 };
 
-// 招商方案档位（参考）
-const SPONSOR_TIERS = [
-  {name:'冠名级', fee:30, booths:'专属展位（入口处/主舞台旁）', desc:'品牌特色展台、乡村市集核心位置体验区、定制vlog、对接地方政府资源'},
-  {name:'金牌级', fee:20, booths:'10个标准展位', desc:'优质区域、品牌指引标识、小程序标注展位位置'},
-  {name:'银牌级', fee:10, booths:'5个标准展位', desc:'统一布置、乡村市集产品售卖点位'},
-  {name:'铜牌级', fee:5,  booths:'5个标准展位', desc:'基础桌椅展板、乡村市集联合展示、线上商城销售渠道'},
-  {name:'支持级', fee:3,  booths:'3个标准展位（全年所有场次）', desc:'基础桌椅、乡村市集联合展示'},
-  {name:'参与级', fee:1,  booths:'1个标准展位（全年所有场次）', desc:'基础桌椅、宣传资料发放'}
-];
+const NETWORK_INFO = {
+  totalPublications: 20020,
+  totalReads: 2.002, // 亿次
+  note: '统计口径：各站活动周期内全网综合阅读量，含新华网及各级媒体首发稿件、转载稿件和短视频等全平台阅读量合计',
+  otherMetrics: [
+    '新华网发稿60余篇',
+    '中央级及全国主流媒体转载80余篇',
+    '省市县三级融媒体转载超500次',
+    '短视频平台累计播放超600万次',
+    '覆盖全省10余个地市、50余个县区'
+  ]
+};
 
-// 往期特色展品记录
-const STATION_PRODUCTS = {
-  1:['手工韭花','联兴山茶油','有机果蔬','生态茶','登封陶艺','古法香道'],
-  2:['砖桥月饼','咸麻鸭蛋','光山花鼓戏/皮影戏文创','十包特产','联兴山茶油'],
-  3:['汝阳红薯','杜康酒','甪里艾'],
-  4:['"淇河三珍"（缠丝鸭蛋等）','冬凌草茶','鹤壁窑陶瓷','泥咕咕'],
-  5:['辉县剪纸','山楂制品','手工红薯粉条','米多奇食品'],
-  6:['湿地相关特产'],
-  7:['太行山特色农产品'],
-  8:['方城特色农产品']
+const COMPANIES = {
+3:[
+{n:'洛阳市霖达食品',c:'食品',p:'地方特色食品',s:2800,f:'效果好'},
+{n:'汝阳县同富粉条专业合作社',c:'土特产',p:'粉条',s:0,f:'展示为主'},
+{n:'河南省飞瑞农业科技有限公司',c:'农业',p:'农产品',s:0,f:''},
+{n:'洛阳孟洗农业',c:'农业',p:'农产品',s:2800,f:'最高'},
+{n:'汝阳县家昌种植',c:'农业',p:'种植',s:2030,f:''},
+{n:'洛阳百蔬香',c:'食品',p:'蔬菜',s:1680,f:''},
+{n:'汝阳县汝香香',c:'食品',p:'食品',s:1500,f:''},
+{n:'洛阳杜康',c:'食品',p:'杜康酒',s:0,f:'知名品牌'},
+{n:'白象养优鲜',c:'食品',p:'方便食品',s:0,f:'知名品牌'},
+{n:'智慧健康科技有限公司',c:'科技',p:'健康产品',s:0,f:'港股HK.01715'},
+{n:'中食民安控股有限公司',c:'食品',p:'食品控股',s:0,f:'港股HK.08283'},
+{n:'长儒集团有限公司',c:'综合',p:'综合集团',s:0,f:''},
+{n:'参展企业13',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业14',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业15',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业16',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业17',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业18',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业19',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业20',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业21',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业22',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业23',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业24',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业25',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业26',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业27',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业28',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业29',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业30',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业31',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业32',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业33',c:'其他',p:'综合展品',s:0,f:''}
+],
+4:[
+{n:'鹤壁市钜亿农业科技发展有限公司',c:'农业',p:'鲜食玉米',s:0,f:''},
+{n:'河南华淼农业开发有限公司',c:'农业',p:'芦笋/西红柿/甜瓜',s:1400,f:'销售最佳'},
+{n:'鹤壁航田科技有限公司',c:'科技',p:'农业科技',s:0,f:''},
+{n:'艾博生态园',c:'农业',p:'生态农产品',s:0,f:''},
+{n:'盛禾种植',c:'农业',p:'种植',s:0,f:''},
+{n:'河南万祥园牧业',c:'农业',p:'牧业',s:0,f:''},
+{n:'金属浮雕锻造',c:'非遗',p:'金属工艺品',s:0,f:''},
+{n:'艺俸斋制香',c:'非遗',p:'制香',s:0,f:''},
+{n:'吕氏雕刻',c:'非遗',p:'雕刻',s:0,f:''},
+{n:'黄河古陶',c:'非遗',p:'陶器',s:0,f:''},
+{n:'鲍氏针灸',c:'非遗',p:'传统医药',s:0,f:''},
+{n:'参展企业12',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业13',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业14',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业15',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业16',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业17',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业18',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业19',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业20',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业21',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业22',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业23',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业24',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业25',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业26',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业27',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业28',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业29',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业30',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业31',c:'其他',p:'综合展品',s:0,f:''}
+],
+5:[
+{n:'河南豫园红汇生物科技有限公司',c:'食品',p:'山楂制品',s:0,f:'注册资本3000万'},
+{n:'河南楂之恋食品有限公司',c:'食品',p:'冻干山楂',s:0,f:''},
+{n:'河南礼遇共城企业管理有限公司',c:'食品',p:'小麦胚芽/玉米金汤',s:0,f:''},
+{n:'河南米多奇食品有限公司',c:'食品',p:'米饼/馍片',s:0,f:'全国品牌/年产值20亿'},
+{n:'河南九龙食品有限公司',c:'食品',p:'花生/芝麻/杂粮',s:0,f:'注册资本1000万'},
+{n:'河南邦尼生物工程有限公司',c:'日化',p:'鞋垫',s:0,f:'高新技术企业/FDA CE认证'},
+{n:'辉县剪纸',c:'非遗',p:'剪纸',s:0,f:''},
+{n:'传拓技艺',c:'非遗',p:'传拓',s:0,f:''},
+{n:'辉县窑烧瓷',c:'非遗',p:'烧瓷',s:0,f:''},
+{n:'共城泥塑',c:'非遗',p:'泥塑',s:0,f:''},
+{n:'太行石雕',c:'非遗',p:'石雕',s:0,f:''},
+{n:'糖画',c:'非遗',p:'糖画',s:0,f:''},
+{n:'草编',c:'非遗',p:'草编',s:0,f:''},
+{n:'河南杞乐生物科技有限公司',c:'日化',p:'手工皂',s:0,f:''},
+{n:'中部聚农食品科技有限公司',c:'食品',p:'食品',s:0,f:''},
+{n:'参展企业16',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业17',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业18',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业19',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业20',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业21',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业22',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业23',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业24',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业25',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业26',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业27',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业28',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业29',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业30',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业31',c:'其他',p:'综合展品',s:0,f:''}
+],
+6:[
+{n:'汤阴县硕果园',c:'农业',p:'果蔬',s:0,f:''},
+{n:'万盛源食品',c:'食品',p:'食品',s:0,f:''},
+{n:'部落生态农庄',c:'农业',p:'生态农产品',s:0,f:''},
+{n:'恒翔农业',c:'农业',p:'农业',s:0,f:''},
+{n:'安阳市豆香村食品',c:'食品',p:'豆制品',s:177,f:''},
+{n:'安阳兴厨调味',c:'食品',p:'调味品',s:0,f:''},
+{n:'河南源香食品',c:'食品',p:'食品',s:140,f:''},
+{n:'益海嘉里(安阳)',c:'食品',p:'粮油',s:240,f:'大型企业'},
+{n:'今麦郎饮品(汤阴)',c:'食品',p:'饮品',s:0,f:'知名品牌'},
+{n:'安阳鼎芝食品',c:'食品',p:'食品',s:110,f:''},
+{n:'河南新东方食品',c:'食品',p:'食品',s:0,f:''},
+{n:'安阳市诺金食品',c:'食品',p:'食品',s:157,f:''},
+{n:'河南嘉士利食品',c:'食品',p:'饼干',s:0,f:'知名品牌'},
+{n:'甘源食品(安阳)',c:'食品',p:'休闲食品',s:0,f:'知名品牌'},
+{n:'滑县道口画宝刚烧鸡',c:'食品',p:'烧鸡',s:200,f:'跨站参展'},
+{n:'安阳钙瑞益健',c:'健康',p:'保健品',s:0,f:''},
+{n:'内黄县枣乡情',c:'食品',p:'枣产品',s:0,f:'跨站参展'},
+{n:'安阳可旺食品',c:'食品',p:'食品',s:0,f:''},
+{n:'安阳华原种养',c:'农业',p:'种养',s:220,f:''},
+{n:'汤阴有礼/易乡古韵',c:'非遗',p:'文创',s:0,f:''},
+{n:'黄河陶塑',c:'非遗',p:'陶塑',s:0,f:''},
+{n:'参展企业22',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业23',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业24',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业25',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业26',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业27',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业28',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业29',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业30',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业31',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业32',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业33',c:'其他',p:'综合展品',s:0,f:''}
+],
+7:[
+{n:'郭氏正骨',c:'非遗',p:'传统医药',s:0,f:''},
+{n:'织韵绳艺',c:'非遗',p:'绳编',s:0,f:''},
+{n:'岐山堂石磨香油',c:'食品',p:'香油',s:0,f:''},
+{n:'张师傅米雕',c:'非遗',p:'米雕',s:0,f:''},
+{n:'烙画',c:'非遗',p:'烙画',s:0,f:''},
+{n:'剪纸',c:'非遗',p:'剪纸',s:0,f:''},
+{n:'草编',c:'非遗',p:'草编',s:0,f:''},
+{n:'布艺',c:'非遗',p:'布艺',s:0,f:''},
+{n:'林州市红旗渠文化创意有限公司',c:'文创',p:'文创产品',s:0,f:''},
+{n:'滑县道口画宝刚烧鸡',c:'食品',p:'烧鸡',s:200,f:'跨站参展'},
+{n:'安阳钙瑞益健',c:'健康',p:'保健品',s:0,f:'跨站参展'},
+{n:'内黄县枣乡情',c:'食品',p:'枣产品',s:0,f:'跨站参展'},
+{n:'安阳可旺食品',c:'食品',p:'食品',s:0,f:'跨站参展'},
+{n:'安阳华原种养',c:'农业',p:'种养',s:220,f:'跨站参展'},
+{n:'益海嘉里(安阳)',c:'食品',p:'粮油',s:0,f:'跨站参展/大型企业'},
+{n:'林州市林虑山农业发展',c:'农业',p:'农产品',s:0,f:''},
+{n:'林州市名优农副产品',c:'农业',p:'农副产品',s:0,f:''},
+{n:'林州市亲情农庄',c:'农业',p:'农产品',s:0,f:''},
+{n:'原康镇柏尖山村农产品',c:'农业',p:'农产品',s:3000,f:'本站最高'},
+{n:'乡味源土特产',c:'土特产',p:'土特产',s:1002,f:''},
+{n:'林州市众禾思食品',c:'食品',p:'食品',s:0,f:''},
+{n:'林州市桂林镇古善村',c:'农业',p:'艾条',s:1200,f:''},
+{n:'林州市太行益友菊品',c:'农业',p:'菊花产品',s:0,f:''},
+{n:'林州市东姚洪河米业',c:'农业',p:'米业',s:0,f:''},
+{n:'林州市奥晨牧业',c:'农业',p:'牧业',s:0,f:''},
+{n:'林州市一亩地种养殖',c:'农业',p:'种养殖',s:3198,f:''},
+{n:'河南红旗渠饮品',c:'食品',p:'饮品',s:0,f:'本地品牌'},
+{n:'林州市石板岩供销社',c:'农业',p:'综合',s:0,f:''},
+{n:'张官营种植养殖',c:'农业',p:'种养殖',s:0,f:''}
+],
+8:[
+{n:'方城石猴',c:'非遗',p:'传统美术',s:345,f:'效果不错'},
+{n:'黄石砚',c:'非遗',p:'工艺品',s:0,f:'小众'},
+{n:'博望军有锅盔',c:'非遗',p:'传统技艺',s:45,f:''},
+{n:'张氏艾制品',c:'非遗',p:'传统医药',s:0,f:'客流不大'},
+{n:'曹氏面人糖人',c:'非遗',p:'传统美术',s:135,f:'小孩多'},
+{n:'货郎担',c:'非遗',p:'民俗',s:0,f:'迟到'},
+{n:'方城糖画',c:'非遗',p:'传统技艺',s:160,f:'小孩喜欢'},
+{n:'中望甜面酱',c:'非遗',p:'传统技艺',s:50,f:'尝多买少'},
+{n:'裴氏刺绣',c:'非遗',p:'传统美术',s:0,f:'围观多'},
+{n:'芝元堂膏剂茶饮',c:'非遗',p:'传统医药',s:0,f:'无销售'},
+{n:'大乘山酒',c:'非遗',p:'传统技艺',s:0,f:'客流一般'},
+{n:'黄石公酒厂',c:'非遗',p:'传统技艺',s:0,f:'人不多'},
+{n:'侯记锅盔',c:'非遗',p:'传统技艺',s:600,f:'还可以'},
+{n:'兆民食品',c:'非遗',p:'传统技艺',s:400,f:'还可以'},
+{n:'方城梳篦',c:'非遗',p:'传统技艺',s:0,f:'看多买少'},
+{n:'薯品汇食品科技（河南）股份有限公司',c:'土特产',p:'酸辣粉/红薯三粉',s:190,f:'效果不错'},
+{n:'河南宛宝制药有限公司',c:'制药',p:'中草药制品',s:0,f:'一般'},
+{n:'玉薯坊农业科技有限公司',c:'土特产',p:'酸辣粉/红薯三粉',s:240,f:'人挺多'},
+{n:'山李人饺子食品有限公司',c:'食品',p:'手工山野菜饺子',s:0,f:'宣传目的'},
+{n:'方城县高峰养蚕专业合作社',c:'农业',p:'桑蚕产品',s:0,f:'展示为主'},
+{n:'方城县众望农业科技有限公司',c:'农业',p:'菊花系列产品',s:0,f:'客流一般'},
+{n:'河南皖北药业有限公司',c:'制药',p:'益母膏',s:2400,f:'效果挺好/本站最高'},
+{n:'方城县瑞达牧业有限公司',c:'农业',p:'禽蛋产品',s:0,f:'展示为主/旅游礼品'},
+{n:'方城县正兴艾制品有限公司',c:'土特产',p:'艾垫/艾叶茶',s:0,f:'问的人不多'},
+{n:'河南荟萃云山农业科技有限公司',c:'农业',p:'裕丹参等中药材',s:0,f:'无销售'},
+{n:'方城县鹏迈农牧',c:'农业',p:'农牧',s:0,f:''},
+{n:'中恒科（方城县）农业发展中心',c:'农业',p:'玄参/白芍系列',s:0,f:'人不多'},
+{n:'南阳道地金木瓜生物科技股份有限公司',c:'农业',p:'木瓜系列产品',s:0,f:'人挺多'},
+{n:'鸿宇农业科技',c:'农业',p:'农业科技',s:0,f:''},
+{n:'方城县丽康家庭农场',c:'农业',p:'黄金梨及系列',s:700,f:'还可以'},
+{n:'旺成食品·樂神康',c:'食品',p:'东方本草植物汽水',s:0,f:'尝的人多'},
+{n:'参展企业32',c:'其他',p:'综合展品',s:0,f:''},
+{n:'参展企业33',c:'其他',p:'综合展品',s:0,f:''}
+]
 };
 
 let curStation = 9;
@@ -369,6 +607,7 @@ function initStore(){
   for(let k in store.stations){
     if(store.stations[k].boothSales===undefined) store.stations[k].boothSales=HIST[k]?.boothSales||0;
     if(store.stations[k].booth===undefined) store.stations[k].booth=HIST[k]?.booth||0;
+    if(store.stations[k].networkReads===undefined) store.stations[k].networkReads=HIST[k]?.networkReads||0;
   }
   if(!store.checklists) store.checklists = {};
   if(!store.issues) store.issues = {};
@@ -397,7 +636,7 @@ function handleStationChange(val){
     if(name){
       const nums=Object.keys(store.stations).map(Number).filter(n=>n>0);
       const nextNum=nums.length?Math.max(...nums)+1:1;
-      store.stations[nextNum]={name,date:'',reg:0,checkin:0,finish:0,articles:0,reads:0,booth:0,cost:0,contractAmt:0,paidAmt:0,boothSales:0};
+      store.stations[nextNum]={name,date:'',reg:0,checkin:0,finish:0,articles:0,reads:0,booth:0,cost:0,contractAmt:0,paidAmt:0,boothSales:0,networkReads:0};
       save();
       populateStationSelector();
       curStation=nextNum;
@@ -470,18 +709,19 @@ function renderPage(page){
   else if(page==='prep') renderPrep();
   else if(page==='live') renderIssues();
   else if(page==='data') renderDataForm();
+  else if(page==='media') renderMedia();
   else if(page==='score') renderScoreForm();
-  else if(page==='contract') renderContracts();
+  else if(page==='merchant') renderMerchant();
   // 领导查看模式：每次渲染后重新禁用编辑
   if(AUTH.currentUser?.role === 'viewer') disableEditing();
 }
 
 function renderHome(){
   // Calculate totals
-  let tReg=0,tCheckin=0,tFinish=0,tArticles=0,tReads=0,tStations=0,tContract=0,tPaid=0,tCost=0,tBooths=0,tSales=0,salesCount=0;
+  let tReg=0,tCheckin=0,tFinish=0,tArticles=0,tReads=0,tStations=0,tContract=0,tPaid=0,tCost=0,tBooths=0,tSales=0,salesCount=0,tNetworkReads=0;
   for(let i=1;i<=20;i++){
     const s=store.stations[i];
-    if(s&&s.reg){tReg+=s.reg||0;tCheckin+=s.checkin||0;tFinish+=s.finish||0;tArticles+=s.articles||0;tReads+=s.reads||0;tStations++;tContract+=s.contractAmt||0;tPaid+=s.paidAmt||0;tCost+=s.cost||0;tBooths+=s.booth||0;if(s.boothSales>0){tSales+=s.boothSales;salesCount++}}
+    if(s&&s.reg){tReg+=s.reg||0;tCheckin+=s.checkin||0;tFinish+=s.finish||0;tArticles+=s.articles||0;tReads+=s.reads||0;tStations++;tContract+=s.contractAmt||0;tPaid+=s.paidAmt||0;tCost+=s.cost||0;tBooths+=s.booth||0;if(s.boothSales>0){tSales+=s.boothSales;salesCount++}tNetworkReads+=s.networkReads||0}
   }
   document.getElementById('totalReg').textContent=tReg.toLocaleString();
   document.getElementById('totalCheckin').textContent=tCheckin.toLocaleString();
@@ -489,6 +729,9 @@ function renderHome(){
   document.getElementById('totalArticles').textContent=tArticles;
   document.getElementById('totalReads').textContent=tReads;
   document.getElementById('totalStations').textContent=tStations;
+  document.getElementById('totalNetworkReads').textContent=tNetworkReads.toLocaleString();
+  document.getElementById('totalNetworkReadsYi').textContent=(tNetworkReads/10000).toFixed(3);
+  document.getElementById('totalMediaHits').textContent=NETWORK_INFO.totalPublications.toLocaleString();
   document.getElementById('totalContract').textContent=tContract.toFixed(1);
   document.getElementById('totalPaid').textContent=tPaid.toFixed(1);
   document.getElementById('totalCost').textContent=tCost.toFixed(1);
@@ -759,6 +1002,296 @@ function showSponsorDetail(){
   document.getElementById('modalBg').classList.add('show');
 }
 
+// ===== 传播页面 =====
+function renderMedia(){
+  // Summary - other metrics
+  document.getElementById('mediaOtherMetrics').innerHTML=NETWORK_INFO.otherMetrics.map(m=>'· '+m).join('<br>')+'<br><br><span style="font-size:11px;opacity:.7">'+NETWORK_INFO.note+'</span>';
+
+  // Table
+  let html='';
+  const totalReads=NETWORK_INFO.totalPublications;
+  for(let i=1;i<=8;i++){
+    const h=HIST[i];
+    const nr=h.networkReads||0;
+    const pct=(nr/totalReads*100).toFixed(1);
+    html+=`<tr><td>${i}</td><td>${h.name}</td><td>${h.date}</td><td>${h.articles}</td><td>${nr.toLocaleString()}</td><td>${pct}%</td></tr>`;
+  }
+  document.getElementById('mediaTable').innerHTML=html;
+
+  // Xinhua metrics
+  document.getElementById('xinhuaMetrics').innerHTML=
+    '· 新华网发稿60余篇<br>'+
+    '· 中央级及全国主流媒体转载80余篇<br>'+
+    '· 省市县三级融媒体转载超500次<br>'+
+    '· 短视频平台累计播放超600万次<br>'+
+    '· 覆盖全省10余个地市、50余个县区';
+
+  renderMediaChart();
+}
+
+function renderMediaChart(){
+  const canvas=document.getElementById('chartMedia');
+  if(!canvas)return;
+  const container=canvas.parentElement;
+  const w=container.clientWidth-20;
+  const h=260;
+  canvas.width=w*2;canvas.height=h*2;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  const ctx=canvas.getContext('2d');
+  ctx.scale(2,2);
+  ctx.clearRect(0,0,w,h);
+
+  const data=[];
+  for(let i=1;i<=8;i++){
+    data.push({name:HIST[i].name,reads:HIST[i].networkReads||0,articles:HIST[i].articles||0});
+  }
+
+  const maxReads=Math.max(...data.map(d=>d.reads),1)*1.2;
+  const pad={top:20,right:20,bottom:40,left:50};
+  const cw=w-pad.left-pad.right;
+  const ch=h-pad.top-pad.bottom;
+
+  // Grid
+  ctx.strokeStyle='#eee';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pad.top+ch*(1-i/4);
+    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(w-pad.right,y);ctx.stroke();
+    ctx.fillStyle='#999';ctx.font='11px sans-serif';ctx.textAlign='right';
+    ctx.fillText(Math.round(maxReads*i/4),pad.left-8,y+4);
+  }
+
+  // Bars
+  const barW=cw/data.length*0.6;
+  const gap=cw/data.length;
+  data.forEach((d,i)=>{
+    const x=pad.left+gap*i+gap*0.2;
+    const barH=ch*(d.reads/maxReads);
+    const y=pad.top+ch-barH;
+
+    const gradient=ctx.createLinearGradient(x,y,x,pad.top+ch);
+    gradient.addColorStop(0,'#34a853');
+    gradient.addColorStop(1,'#0d7a3e');
+    ctx.fillStyle=gradient;
+    ctx.fillRect(x,y,barW,barH);
+
+    ctx.fillStyle='#666';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText(d.name,x+barW/2,h-pad.bottom+20);
+
+    ctx.fillStyle='#333';ctx.font='bold 11px sans-serif';
+    ctx.fillText(d.reads,x+barW/2,y-5);
+  });
+
+  // Legend
+  ctx.fillStyle='#34a853';ctx.fillRect(pad.left+10,8,12,10);
+  ctx.fillStyle='#666';ctx.font='11px sans-serif';ctx.textAlign='left';
+  ctx.fillText('全网阅读量(万)',pad.left+26,17);
+}
+
+// ===== 招商页面 =====
+function renderMerchant(){
+  renderMerchantOverview();
+  const activeTab=document.querySelector('.merchant-tab.active');
+  const tabName=activeTab?activeTab.textContent:'招商总览';
+  if(tabName.includes('品牌方')) renderMerchantBrands();
+  else if(tabName.includes('货盘')) renderMerchantPool();
+  renderContracts();
+}
+
+function switchMerchantTab(tab){
+  document.querySelectorAll('.merchant-tab').forEach(b=>{b.classList.remove('active');b.className='btn btn-outline btn-sm merchant-tab'});
+  event.target.className='btn btn-primary btn-sm merchant-tab active';
+  document.getElementById('merchantOverview').style.display=tab==='overview'?'block':'none';
+  document.getElementById('merchantBrands').style.display=tab==='brands'?'block':'none';
+  document.getElementById('merchantPool').style.display=tab==='pool'?'block':'none';
+  if(tab==='overview') renderMerchantOverview();
+  else if(tab==='brands') renderMerchantBrands();
+  else if(tab==='pool') renderMerchantPool();
+}
+
+function renderMerchantOverview(){
+  let totalCompanies=0;
+  let stationCounts=[];
+  let allSales=[];
+  for(let i=3;i<=8;i++){
+    const comps=COMPANIES[i]||[];
+    totalCompanies+=comps.length;
+    stationCounts.push({num:i,name:HIST[i].name,count:comps.length});
+    comps.forEach(c=>{
+      if(c.s>0) allSales.push({name:c.n,sales:c.s,station:HIST[i].name,stationNum:i});
+    });
+  }
+  allSales.sort((a,b)=>b.sales-a.sales);
+  const topSales=allSales.slice(0,10);
+
+  let html='<div class="stats">';
+  html+='<div class="stat"><div class="v">'+totalCompanies+'</div><div class="l">参展企业总数</div></div>';
+  html+='<div class="stat"><div class="v">'+(stationCounts.length)+'</div><div class="l">有参展数据站点</div></div>';
+  html+='<div class="stat ok"><div class="v">'+allSales.length+'</div><div class="l">有销售记录企业</div></div>';
+  html+='<div class="stat warn"><div class="v">'+allSales.reduce((a,b)=>a+b.sales,0).toLocaleString()+'</div><div class="l">总销售额(元)</div></div>';
+  html+='</div>';
+
+  html+='<div class="card"><div class="card-title">各站参展企业数</div>';
+  html+='<table><tr><th>站次</th><th>站点</th><th>企业数</th></tr>';
+  stationCounts.forEach(s=>{
+    html+='<tr><td>'+s.num+'</td><td>'+s.name+'</td><td>'+s.count+'</td></tr>';
+  });
+  html+='</table></div>';
+
+  if(topSales.length){
+    html+='<div class="card"><div class="card-title">销售额TOP10</div>';
+    topSales.forEach((c,i)=>{
+      html+='<div style="display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #f0f0f0"><span><b style="color:var(--p)">'+(i+1)+'</b> '+c.name+'</span><span style="font-weight:600;color:var(--ok)">'+c.sales.toLocaleString()+'元</span></div>';
+    });
+    html+='</div>';
+  }
+
+  html+='<div class="card"><div class="card-title">招商方案档位</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  SPONSOR_TIERS.forEach(t=>{
+    html+='<div style="text-align:center;padding:8px;background:#f8f9fa;border-radius:8px"><div style="font-size:13px;font-weight:600;color:var(--p)">'+t.name+'</div><div style="font-size:18px;font-weight:700;margin:4px 0">'+t.fee+'万</div></div>';
+  });
+  html+='</div></div>';
+
+  document.getElementById('merchantOverview').innerHTML=html;
+}
+
+function renderMerchantBrands(){
+  let html='<div style="margin-bottom:12px"><div style="font-size:13px;color:var(--t2);margin-bottom:8px">选择站点查看参展品牌方：</div>';
+  html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+  for(let i=3;i<=8;i++){
+    const isActive=i===curStation;
+    html+='<button class="btn '+(isActive?'btn-primary':'btn-outline')+' btn-sm" onclick="showStationBrands('+i+')">'+HIST[i].name+'('+(COMPANIES[i]||[]).length+')</button>';
+  }
+  html+='</div></div>';
+  html+='<div id="brandsList"></div>';
+
+  document.getElementById('merchantBrands').innerHTML=html;
+  showStationBrands(curStation);
+}
+
+function showStationBrands(stationNum){
+  const comps=COMPANIES[stationNum]||[];
+  let html='<div style="font-size:13px;color:var(--t2);margin-bottom:8px">第'+stationNum+'站·'+HIST[stationNum].name+' — 共'+comps.length+'家参展企业</div>';
+  comps.forEach((c,i)=>{
+    const catClass=c.c==='非遗'?'badge-warn':c.c==='食品'?'badge-ok':c.c==='农业'?'badge-blue':'badge-blue';
+    html+='<div style="padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="showCompanyDetail(\''+c.n.replace(/'/g,"\\'")+'\')">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    html+='<div style="flex:1"><b style="font-size:14px">'+c.n+'</b>';
+    html+=' <span class="badge '+catClass+'">'+c.c+'</span></div>';
+    if(c.s>0) html+='<span style="font-weight:600;color:var(--ok)">'+c.s.toLocaleString()+'元</span>';
+    html+='</div>';
+    html+='<div style="font-size:12px;color:var(--t2);margin-top:4px">'+c.p+(c.f?' · '+c.f:'')+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('brandsList').innerHTML=html;
+
+  // Update active button
+  document.querySelectorAll('#merchantBrands .btn-sm').forEach(b=>{
+    if(b.textContent.includes(HIST[stationNum].name)){
+      b.className='btn btn-primary btn-sm';
+    }else{
+      b.className='btn btn-outline btn-sm';
+    }
+  });
+}
+
+function showCompanyDetail(name){
+  let stations=[];
+  let totalSales=0;
+  let allFeedback=[];
+  let compData=null;
+  for(let s in COMPANIES){
+    const found=COMPANIES[s].find(c=>c.n===name);
+    if(found){
+      stations.push({num:+s,name:HIST[s].name});
+      totalSales+=found.s;
+      if(found.f) allFeedback.push(HIST[s].name+': '+found.f);
+      if(!compData) compData=found;
+    }
+  }
+  if(!compData) return;
+  let html='<h3>'+compData.n+'</h3>';
+  html+='<div style="margin-bottom:10px"><span class="badge badge-blue">'+compData.c+'</span>';
+  if(stations.length>1) html+=' <span class="badge badge-warn">参展'+stations.length+'站</span>';
+  html+='</div>';
+  html+='<div style="font-size:14px;line-height:2">';
+  html+='<b>产品：</b>'+compData.p+'<br>';
+  html+='<b>参展站点：</b>'+stations.map(s=>s.name).join('、')+'<br>';
+  html+='<b>销售额：</b><span style="color:var(--ok);font-weight:600">'+totalSales.toLocaleString()+'元</span><br>';
+  if(allFeedback.length) html+='<b>反馈：</b>'+allFeedback.join('；')+'<br>';
+  html+='</div>';
+  html+='<button class="btn btn-outline" style="margin-top:14px" onclick="closeModal()">关闭</button>';
+  document.getElementById('modalContent').innerHTML=html;
+  document.getElementById('modalBg').classList.add('show');
+}
+
+function renderMerchantPool(){
+  let html='<div style="margin-bottom:12px">';
+  html+='<input type="text" id="poolSearch" placeholder="搜索企业名称..." style="width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;font-size:14px;margin-bottom:8px" oninput="filterPool()">';
+  html+='<div style="display:flex;gap:6px;flex-wrap:wrap" id="poolCats"></div>';
+  html+='</div>';
+  html+='<div id="poolList"></div>';
+  document.getElementById('merchantPool').innerHTML=html;
+
+  // Collect categories
+  const cats=new Set();
+  for(let s in COMPANIES) COMPANIES[s].forEach(c=>cats.add(c.c));
+  let catHtml='<button class="btn btn-primary btn-sm" onclick="filterPoolByCat(\'all\')">全部</button>';
+  cats.forEach(c=>{
+    catHtml+='<button class="btn btn-outline btn-sm" onclick="filterPoolByCat(\''+c+'\')">'+c+'</button>';
+  });
+  document.getElementById('poolCats').innerHTML=catHtml;
+  filterPool();
+}
+
+function filterPool(){
+  const search=(document.getElementById('poolSearch')?.value||'').trim().toLowerCase();
+  const curCat=window._poolCat||'all';
+
+  // Collect unique companies
+  const unique={};
+  for(let s in COMPANIES){
+    COMPANIES[s].forEach((c,i)=>{
+      if(!unique[c.n]) unique[c.n]={data:c,stations:[],totalSales:0};
+      unique[c.n].stations.push(+s);
+      unique[c.n].totalSales+=c.s;
+    });
+  }
+
+  let list=Object.values(unique);
+  if(search) list=list.filter(c=>c.data.n.toLowerCase().includes(search));
+  if(curCat!=='all') list=list.filter(c=>c.data.c===curCat);
+
+  let html='<div style="font-size:12px;color:var(--t2);margin-bottom:8px">共'+list.length+'家企业</div>';
+  list.forEach(c=>{
+    const catClass=c.data.c==='非遗'?'badge-warn':c.data.c==='食品'?'badge-ok':'badge-blue';
+    html+='<div style="padding:10px;border-bottom:1px solid #f0f0f0;cursor:pointer" onclick="showCompanyDetail(\''+c.data.n.replace(/'/g,"\\'")+'\')">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center">';
+    html+='<div><b>'+c.data.n+'</b> <span class="badge '+catClass+'">'+c.data.c+'</span>';
+    if(c.stations.length>1) html+=' <span class="badge badge-warn">参展'+c.stations.length+'站</span>';
+    html+='</div>';
+    if(c.totalSales>0) html+='<span style="font-weight:600;color:var(--ok);font-size:13px">'+c.totalSales.toLocaleString()+'元</span>';
+    html+='</div>';
+    html+='<div style="font-size:12px;color:var(--t2);margin-top:4px">'+c.data.p+'</div>';
+    html+='</div>';
+  });
+  document.getElementById('poolList').innerHTML=html;
+}
+
+function filterPoolByCat(cat){
+  window._poolCat=cat;
+  document.querySelectorAll('#poolCats .btn-sm').forEach(b=>{
+    const bCat=b.textContent;
+    if((cat==='all'&&bCat==='全部')||bCat===cat){
+      b.className='btn btn-primary btn-sm';
+    }else{
+      b.className='btn btn-outline btn-sm';
+    }
+  });
+  filterPool();
+}
+
+// ===== 合同 =====
 function renderContracts(){
   const list=store.contracts[curStation]||[];
   let html='';
@@ -837,9 +1370,9 @@ function showLeaderView(){
 }
 
 function disableEditing(){
-  // 隐藏编辑按钮，只保留查看
+  // 隐藏编辑的按钮，只保留查看
   document.querySelectorAll('.btn-primary, .btn-ok, .btn-err, .btn-warn').forEach(b => {
-    if(b.textContent.includes('保存') || b.textContent.includes('提交') || b.textContent.includes('添加')){
+    if(b.textContent.includes('保存') || b.textContent.includes('提交') || b.textContent.includes('添加') || b.textContent.includes('标记解决')){
       b.style.display = 'none';
     }
   });
@@ -847,16 +1380,29 @@ function disableEditing(){
   document.querySelectorAll('input, textarea').forEach(el => {
     if(el.id !== 'stationSel') el.disabled = true;
   });
+  // 禁用选择框
+  document.querySelectorAll('select').forEach(el => {
+    if(el.id !== 'stationSel') el.disabled = true;
+  });
   // 隐藏"新增站点"选项
   const sel = document.getElementById('stationSel');
   const newOpt = sel.querySelector('option[value="new"]');
   if(newOpt) newOpt.style.display = 'none';
-  // 隐藏编辑类标签页（现场、数据），保留首页/筹备/评分/合同查看
+  // 隐藏编辑类标签页（现场、数据），保留首页/筹备/评分/传播/招商查看
   document.querySelectorAll('.bn-item').forEach(item => {
     if(item.dataset.page === 'live' || item.dataset.page === 'data'){
       item.style.display = 'none';
     }
   });
+  // 隐藏招商子标签（添加/编辑功能），保留查看
+  document.querySelectorAll('.merchant-tab').forEach(b => {
+    b.style.display = 'none';
+  });
+  // 隐藏合同表单区域（添加合同卡片）
+  const contractForm = document.querySelector('#pg-merchant .card .card-title');
+  if(contractForm && contractForm.textContent.includes('添加合同')){
+    contractForm.parentElement.style.display = 'none';
+  }
 }
 
 function logout(){
