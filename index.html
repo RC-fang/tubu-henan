@@ -528,6 +528,13 @@ const COMPANIES = {
 ]
 };
 
+// ===== 招商方案档位 =====
+const SPONSOR_TIERS = [
+  {name:'冠名赞助',fee:10,booths:'2个展位',desc:'全程冠名、主背景板LOGO、开幕式致辞、专属推文、全程视频露出'},
+  {name:'金牌赞助',fee:5,booths:'1个展位',desc:'主背景板LOGO、开幕式鸣谢、专属推文、现场展位'},
+  {name:'标准展位',fee:2,booths:'1个展位',desc:'现场标准展位、活动推文品牌露出、现场宣传物料'}
+];
+
 // ===== 企业工商信息数据库（网上查询） =====
 // tier: 1=大型企业 2=中型企业 3=小型企业 4=微型企业/个体 5=非遗手工
 const CI={
@@ -831,7 +838,11 @@ function renderHomeChart(){
   const container=canvas.parentElement;
   const w=container.clientWidth-20;
   const h=260;
-  if(w<50) return; // container not ready yet
+  if(w<50){
+    // Retry after a short delay if container not ready
+    setTimeout(renderHomeChart, 300);
+    return;
+  }
   canvas.width=w*2;canvas.height=h*2;
   canvas.style.width=w+'px';canvas.style.height=h+'px';
   const ctx=canvas.getContext('2d');
