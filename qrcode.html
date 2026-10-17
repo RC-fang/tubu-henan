@@ -3,63 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>禾力乡村·徒步河南 工作台入口</title>
+<title>禾力乡村·徒步河南 工作台</title>
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,#1a73e8,#0d47a1);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
-.container{background:#fff;border-radius:20px;padding:30px 24px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-h1{text-align:center;font-size:20px;color:#1a73e8;margin-bottom:8px}
-.subtitle{text-align:center;font-size:13px;color:#666;margin-bottom:24px}
-.qr-card{background:#f8f9fa;border-radius:16px;padding:20px;margin-bottom:16px;text-align:center;border:2px solid #e8f0fe}
-.qr-card:last-child{margin-bottom:0}
-.qr-card h2{font-size:16px;color:#333;margin-bottom:4px}
-.qr-card p{font-size:12px;color:#999;margin-bottom:12px}
-.qr-box{display:inline-block;padding:12px;background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
-.tip{text-align:center;font-size:11px;color:#aaa;margin-top:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;background:#f0f2f5;padding:20px}
+.card{background:#fff;border-radius:16px;padding:30px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,.1);max-width:400px;width:100%}
+h1{font-size:20px;color:#1a73e8;margin-bottom:8px}
+.url{font-size:13px;color:#666;margin-bottom:20px;word-break:break-all}
+#qrcode{display:flex;justify-content:center;margin:20px 0}
+.tip{font-size:13px;color:#999;margin-top:16px}
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>禾力乡村·徒步河南</h1>
-  <p class="subtitle">工作台入口</p>
-  
-  <div class="qr-card">
-    <h2>管理员入口</h2>
-    <p>扫码登录管理员账号（小杨）</p>
-    <div class="qr-box" id="qr-admin"></div>
-  </div>
-  
-  <div class="qr-card">
-    <h2>领导查看入口</h2>
-    <p>扫码登录只读账号（领导查看）</p>
-    <div class="qr-box" id="qr-leader"></div>
-  </div>
-  
-  <p class="tip">扫描二维码自动登录，无需输入账号密码</p>
+<div class="card">
+<h1>禾力乡村·徒步河南 工作台</h1>
+<div class="url">https://rc-fang.github.io/tubu-henan/?v=10</div>
+<div id="qrcode"></div>
+<div class="tip">微信扫码打开<br>领导查看 / 现场操作</div>
 </div>
-
 <script>
-const BASE_URL = 'https://rc-fang.github.io/tubu-henan';
-
-// 管理员二维码
-new QRCode(document.getElementById('qr-admin'), {
-  text: BASE_URL + '/?user=%E5%B0%8F%E6%9D%A8&pass=18101117007',
-  width: 180,
-  height: 180,
-  colorDark: '#1a73e8',
-  colorLight: '#ffffff',
-  correctLevel: QRCode.CorrectLevel.M
-});
-
-// 领导查看二维码
-new QRCode(document.getElementById('qr-leader'), {
-  text: BASE_URL + '/?user=leader&pass=view2026',
-  width: 180,
-  height: 180,
-  colorDark: '#34a853',
-  colorLight: '#ffffff',
-  correctLevel: QRCode.CorrectLevel.M
+new QRCode(document.getElementById("qrcode"), {
+  text: "https://rc-fang.github.io/tubu-henan/?v=10",
+  width: 256,
+  height: 256,
+  colorDark: "#1a73e8",
+  colorLight: "#ffffff",
+  correctLevel: QRCode.CorrectLevel.H
 });
 </script>
 </body>
