@@ -160,7 +160,7 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 </div>
 <div class="card">
 <div class="card-title">八站趋势</div>
-<div class="chart-box"><canvas id="chartHome"></canvas></div>
+<div id="chartHome" style="padding:10px 0"></div>
 </div>
 <div class="card">
 <div class="card-title"><span id="productsTitle">往期展品</span> <span style="font-size:12px;color:var(--t2);font-weight:400" id="productsLabel"></span></div>
@@ -833,93 +833,41 @@ function renderHome(){
 }
 
 function renderHomeChart(){
-  const canvas=document.getElementById('chartHome');
-  if(!canvas)return;
-  const container=canvas.parentElement;
-  const w=container.clientWidth-20;
-  const h=220;
-  if(w<50){
-    // Retry after a short delay if container not ready
-    setTimeout(renderHomeChart, 300);
-    return;
-  }
-  canvas.width=w*2;canvas.height=h*2;
-  canvas.style.width=w+'px';canvas.style.height=h+'px';
-  const ctx=canvas.getContext('2d');
-  ctx.setTransform(2,0,0,2,0,0); // use setTransform instead of scale to avoid compounding
-  ctx.clearRect(0,0,w,h);
-
-  // Collect data for all stations
+  const container=document.getElementById('chartHome');
+  if(!container)return;
   const stations=[];
   for(let i=1;i<=20;i++){
     const s=store.stations[i];
-    if(s&&s.reg) stations.push({num:i,name:s.name,cost:s.cost||0,contract:s.contractAmt||0,reg:s.reg||0,checkin:s.checkin||0});
+    if(s&&s.reg) stations.push({num:i,name:s.name,cost:s.cost||0,contract:s.contractAmt||0});
   }
   if(stations.length<2){
-    ctx.fillStyle='#999';ctx.font='14px sans-serif';ctx.textAlign='center';
-    ctx.fillText('至少需要2场数据才能显示趋势图',w/2,h/2);
+    container.innerHTML='<div style="text-align:center;color:#999;padding:40px 0">至少需要 2 场数据才能显示趋势图</div>';
     return;
   }
 
-  const pad={top:20,right:20,bottom:40,left:50};
-  const cw=w-pad.left-pad.right;
-  const ch=h-pad.top-pad.bottom;
-
-  // Find max values
-  const maxCost=Math.max(...stations.map(s=>s.cost),10);
-  const maxContract=Math.max(...stations.map(s=>s.contract),10);
-  const maxVal=Math.max(maxCost,maxContract)*1.2;
-
-  // Draw grid
-  ctx.strokeStyle='#eee';ctx.lineWidth=1;
-  for(let i=0;i<=4;i++){
-    const y=pad.top+ch*(1-i/4);
-    ctx.beginPath();ctx.moveTo(pad.left,y);ctx.lineTo(w-pad.right,y);ctx.stroke();
-    ctx.fillStyle='#999';ctx.font='11px sans-serif';ctx.textAlign='right';
-    ctx.fillText((maxVal*i/4).toFixed(1),pad.left-8,y+4);
-  }
-
-  // Draw x-axis labels
-  ctx.fillStyle='#666';ctx.font='11px sans-serif';ctx.textAlign='center';
-  stations.forEach((s,i)=>{
-    const x=pad.left+cw*i/(stations.length-1);
-    ctx.fillText(s.name,x,h-pad.bottom+20);
+  const maxVal=Math.max(...stations.map(s=>Math.max(s.cost,s.contract)),10)*1.2;
+  let html='<div style="display:flex;align-items:flex-end;gap:8px;height:200px;padding:0 10px;border-bottom:1px solid #eee;position:relative">';
+  html+='<div style="position:absolute;left:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:#999;padding-right:8px">';
+  for(let i=4;i>=0;i--) html+='<span>'+(maxVal*i/4).toFixed(1)+'</span>';
+  html+='</div>';
+  html+='<div style="display:flex;align-items:flex-end;gap:6px;flex:1;margin-left:35px;height:100%">';
+  stations.forEach(s=>{
+    const costH=(s.cost/maxVal*100);
+    const contractH=(s.contract/maxVal*100);
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
+    html+='<div style="display:flex;gap:2px;align-items:flex-end;height:100%;width:100%">';
+    html+='<div style="flex:1;background:#ea4335;border-radius:2px 2px 0 0;height:'+costH+'%;min-height:2px" title="成本:'+s.cost+'万"></div>';
+    html+='<div style="flex:1;background:#1a73e8;border-radius:2px 2px 0 0;height:'+contractH+'%;min-height:2px" title="签约:'+s.contract+'万"></div>';
+    html+='</div>';
+    html+='<div style="font-size:10px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center">'+s.name+'</div>';
+    html+='</div>';
   });
-
-  // Draw cost line (red)
-  ctx.strokeStyle='#ea4335';ctx.lineWidth=2.5;ctx.beginPath();
-  stations.forEach((s,i)=>{
-    const x=pad.left+cw*i/(stations.length-1);
-    const y=pad.top+ch*(1-s.cost/maxVal);
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-  // Cost dots
-  stations.forEach((s,i)=>{
-    const x=pad.left+cw*i/(stations.length-1);
-    const y=pad.top+ch*(1-s.cost/maxVal);
-    ctx.fillStyle='#ea4335';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
-  });
-
-  // Draw contract line (blue)
-  ctx.strokeStyle='#1a73e8';ctx.lineWidth=2.5;ctx.beginPath();
-  stations.forEach((s,i)=>{
-    const x=pad.left+cw*i/(stations.length-1);
-    const y=pad.top+ch*(1-s.contract/maxVal);
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  });
-  ctx.stroke();
-  // Contract dots
-  stations.forEach((s,i)=>{
-    const x=pad.left+cw*i/(stations.length-1);
-    const y=pad.top+ch*(1-s.contract/maxVal);
-    ctx.fillStyle='#1a73e8';ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill();
-  });
-
-  // Legend
-  const lx=pad.left+10,ly=8;
-  ctx.fillStyle='#ea4335';ctx.fillRect(lx,ly,12,3);ctx.fillStyle='#666';ctx.font='11px sans-serif';ctx.textAlign='left';ctx.fillText('成本(万)',lx+16,ly+4);
-  ctx.fillStyle='#1a73e8';ctx.fillRect(lx+80,ly,12,3);ctx.fillStyle='#666';ctx.fillText('签约(万)',lx+96,ly+4);
+  html+='</div></div>';
+  html+='<div style="display:flex;gap:16px;justify-content:center;padding:8px 0;font-size:11px;color:#666">';
+  html+='<span><span style="display:inline-block;width:12px;height:3px;background:#ea4335;margin-right:4px;vertical-align:middle"></span>成本 (万)</span>';
+  html+='<span><span style="display:inline-block;width:12px;height:3px;background:#1a73e8;margin-right:4px;vertical-align:middle"></span>签约 (万)</span>';
+  html+='</div>';
+  container.innerHTML=html;
 }
 
 function renderPrep(){
