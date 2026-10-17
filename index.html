@@ -78,7 +78,7 @@ th{background:#f8f9fa;font-weight:600;color:var(--t2);font-size:12px}
 .divider{height:1px;background:var(--bd);margin:14px 0}
 .empty{text-align:center;padding:30px;color:var(--t2)}
 .progress{height:6px;background:#f0f0f0;border-radius:3px;overflow:hidden;margin-top:4px}
-.progress-fill{height:100%;background:var(--p);border-radius:3px;transition:width .3s}
+.progress-fill{height:180px;background:var(--p);border-radius:3px;transition:width .3s}
 .merchant-tab{border-radius:20px;white-space:nowrap}
 .merchant-tab.active{background:var(--p);color:#fff}
 @media(min-width:768px){.stats{grid-template-columns:repeat(4,1fr)}.page{max-width:720px;margin:0 auto}.chart-box{height:300px}}
@@ -859,14 +859,14 @@ function renderHomeChart(){
   html+='<div style="position:absolute;left:0;top:0;bottom:0;display:flex;flex-direction:column;justify-content:space-between;font-size:11px;color:#999;padding-right:8px">';
   for(let i=4;i>=0;i--) html+='<span>'+(maxVal*i/4).toFixed(1)+'</span>';
   html+='</div>';
-  html+='<div style="display:flex;align-items:flex-end;gap:6px;flex:1;margin-left:35px;height:100%">';
+  html+='<div style="display:flex;align-items:flex-end;gap:6px;flex:1;margin-left:35px;height:180px">';
   stations.forEach(s=>{
     const costH=(s.cost/maxVal*100);
     const contractH=(s.contract/maxVal*100);
     html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
-    html+='<div style="display:flex;gap:2px;align-items:flex-end;height:100%;width:100%">';
-    html+='<div style="flex:1;background:#ea4335;border-radius:2px 2px 0 0;height:'+costH+'%;min-height:2px" title="成本:'+s.cost+'万"></div>';
-    html+='<div style="flex:1;background:#1a73e8;border-radius:2px 2px 0 0;height:'+contractH+'%;min-height:2px" title="签约:'+s.contract+'万"></div>';
+    html+='<div style="display:flex;gap:2px;align-items:flex-end;height:180px;width:100%">';
+    html+='<div style="flex:1;background:#ea4335;border-radius:2px 2px 0 0;height:'+(costH/100*180)+'px;min-height:2px" title="成本:'+s.cost+'万"></div>';
+    html+='<div style="flex:1;background:#1a73e8;border-radius:2px 2px 0 0;height:'+(contractH/100*180)+'px;min-height:2px" title="签约:'+s.contract+'万"></div>';
     html+='</div>';
     html+='<div style="font-size:10px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center">'+s.name+'</div>';
     html+='</div>';
