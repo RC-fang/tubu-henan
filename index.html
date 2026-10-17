@@ -710,9 +710,10 @@ function save(){
 
 function startFirebaseSync(){
   if(fbListener) return;
+  let firstSync = true;
   fbListener = DB_REF.on('value', snap=>{
     const data = snap.val();
-    if(data && data._ver){
+    if(data && data._ver && data.stations && data.stations['1'] && data.stations['1'].reg){
       const changed = JSON.stringify(data) !== JSON.stringify(store);
       if(changed){
         store = data;
@@ -729,7 +730,10 @@ function startFirebaseSync(){
           else if(pageId==='pg-merchant') renderMerchant();
         }
       }
+    } else if(firstSync){
+      DB_REF.set(store).catch(e=>console.warn('Firebase init write failed:',e));
     }
+    firstSync = false;
   });
   fbReady = true;
   DB_REF.set(store).catch(e=>console.warn('Firebase init write failed:',e));
