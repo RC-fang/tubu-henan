@@ -1737,9 +1737,9 @@ window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('mainApp').style.display = 'block';
       document.getElementById('userInfo').textContent = auth.name;
       initStore();
-      startFirebaseSync();
       populateStationSelector();
       renderHome();
+      startFirebaseSync();
       if(auth.role === 'viewer'){
         disableEditing();
       }
@@ -1755,9 +1755,9 @@ window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('mainApp').style.display = 'block';
       document.getElementById('userInfo').textContent = AUTH.currentUser.name;
       initStore();
-      startFirebaseSync();
       populateStationSelector();
       renderHome();
+      startFirebaseSync();
       if(AUTH.currentUser.role === 'viewer'){
         disableEditing();
       }
