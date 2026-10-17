@@ -718,6 +718,7 @@ function initStore(){
     }
     store._ver = DATA_VERSION;
   }
+  if(!store.checklists) store.checklists = {};
   for(let k in store.stations){
     if(store.stations[k].boothSales===undefined) store.stations[k].boothSales=HIST[k]?.boothSales||0;
     if(store.stations[k].booth===undefined) store.stations[k].booth=HIST[k]?.booth||0;
