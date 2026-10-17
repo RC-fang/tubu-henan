@@ -720,6 +720,7 @@ function initStore(){
   }
   if(!store.checklists) store.checklists = {};
   for(let k in store.stations){
+    if(!store.stations[k]) continue;
     if(store.stations[k].boothSales===undefined) store.stations[k].boothSales=HIST[k]?.boothSales||0;
     if(store.stations[k].booth===undefined) store.stations[k].booth=HIST[k]?.booth||0;
     if(store.stations[k].networkReads===undefined) store.stations[k].networkReads=HIST[k]?.networkReads||0;
