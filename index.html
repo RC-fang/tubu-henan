@@ -964,7 +964,10 @@ function renderHome(){
     <div class="stat warn"><div class="v">${s.reads?s.reads+'万':'—'}</div><div class="l">阅读量</div></div>
     <div class="stat"><div class="v">${s.booth||'—'}</div><div class="l">展位数</div></div>
     <div class="stat ok"><div class="v">${salesText}</div><div class="l">带动销售</div></div>`;
-  const prog=getChecklistProgress();
+  
+  // 已完成站点显示100%进度
+  const isCompleted = s && s.reg && s.reg > 0;
+  const prog = isCompleted ? {total: 54, done: 54, pct: 100} : getChecklistProgress();
   
   // 动态获取所有站点（包括新增的）
   const allStationKeys = Object.keys(store.stations).map(Number).filter(n => n > 0 && store.stations[n]);
