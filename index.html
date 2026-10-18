@@ -966,28 +966,34 @@ function renderHome(){
     <div class="stat ok"><div class="v">${salesText}</div><div class="l">带动销售</div></div>`;
   const prog=getChecklistProgress();
   
-  // 检查前8站是否全部完成
+  // 动态获取所有站点
+  const allStationNums = Object.keys(store.stations).map(Number).filter(n => n > 0 && store.stations[n] && store.stations[n].reg);
+  const totalStations = allStationNums.length;
+  
+  // 检查是否所有站点都已完成
   let allCompleted = true;
   let completedCount = 0;
-  for(let i=1; i<=8; i++){
-    if(isStationCompleted(i)){
+  for(let i=1; i<=20; i++){
+    const s = store.stations[i];
+    if(s && s.reg){
       completedCount++;
-    } else {
+    } else if(s && !s.reg && allStationNums.length > 0){
+      // 有站点数据但未完成
       allCompleted = false;
     }
   }
   
   let checklistHtml = '';
-  if(allCompleted && completedCount === 8){
-    // 前8站全部完成，显示整体总结
+  if(allCompleted && totalStations > 0){
+    // 所有站点全部完成，显示整体总结
     checklistHtml = `
       <div style="text-align:center;padding:16px">
         <div style="font-size:36px;margin-bottom:8px">🎉</div>
-        <div style="font-size:16px;font-weight:600;color:var(--ok);margin-bottom:8px">前8站已全部完成</div>
+        <div style="font-size:16px;font-weight:600;color:var(--ok);margin-bottom:8px">全部${totalStations}站已完成</div>
         <div style="font-size:13px;color:var(--t2);margin-bottom:16px">所有筹备任务已归档备案</div>
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">
           <div>
-            <div style="font-size:20px;font-weight:700;color:var(--p)">8</div>
+            <div style="font-size:20px;font-weight:700;color:var(--p)">${totalStations}</div>
             <div style="font-size:11px;color:var(--t2)">已完成站点</div>
           </div>
           <div>
@@ -1008,7 +1014,7 @@ function renderHome(){
         <span style="color:var(--p);font-weight:600">${prog.pct}%</span>
       </div>
       <div class="progress"><div class="progress-fill" style="width:${prog.pct}%"></div></div>
-      ${completedCount > 0 ? `<div style="font-size:12px;color:var(--t2);margin-top:8px;text-align:center">已完成 ${completedCount}/8 站</div>` : ''}`;
+      ${completedCount > 0 ? `<div style="font-size:12px;color:var(--t2);margin-top:8px;text-align:center">已完成 ${completedCount}/${totalStations} 站</div>` : ''}`;
   }
   document.getElementById('homeChecklist').innerHTML = checklistHtml;
 
