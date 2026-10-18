@@ -1112,7 +1112,7 @@ function renderPrep(){
     CHECKLIST.forEach(c=>{
       const key=curStation+'_'+c.phase;
       const tasks=c.tasks;
-      let done=0;tasks.forEach((_,i)=>{if(store.checklists[key]?.[i])done++});
+      let done=0;tasks.forEach((_,i)=>{if(store.checklists?.[key]?.[i])done++});
       html+=`<div style="margin-bottom:12px"><div style="font-weight:600;font-size:14px;margin-bottom:6px;display:flex;justify-content:space-between"><span>${c.phase}</span><span style="font-size:12px;color:var(--t2)">${done}/${tasks.length}</span></div>${renderChecklist(c.phase)}</div>`;
     });
     document.getElementById('prepChecklist').innerHTML=html;
