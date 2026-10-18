@@ -704,6 +704,7 @@ function getRankedCompanies(){
 
 const DATA_VERSION = 4; // 数据版本号，COMPANY_INFO更新时递增
 let curStation = 1;
+let curPage = 'home';
 let store = JSON.parse(localStorage.getItem('tubu_workbench')||'{}');
 let _saveTimer = null;
 
@@ -837,7 +838,7 @@ function handleStationChange(val){
     return;
   }
   curStation=parseInt(val);
-  renderPage('home');
+  renderPage(curPage);
 }
 
 function closeAddStationModal(){
@@ -919,6 +920,7 @@ function getChecklistProgress(){
 
 // ===== Render Pages =====
 function renderPage(page){
+  curPage = page;
   if(page==='home') renderHome();
   else if(page==='prep') renderPrep();
   else if(page==='live') renderIssues();
