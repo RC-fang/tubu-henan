@@ -892,6 +892,7 @@ const CHECKLIST = [
 
 function renderChecklist(phase){
   const key=curStation+'_'+phase;
+  if(!store.checklists) store.checklists={};
   if(!store.checklists[key]) store.checklists[key]={};
   const tasks=CHECKLIST.find(c=>c.phase===phase)?.tasks||[];
   const isViewer = AUTH.currentUser?.role === 'viewer';
@@ -905,6 +906,7 @@ function renderChecklist(phase){
 }
 function toggleCheck(phase,idx){
   const key=curStation+'_'+phase;
+  if(!store.checklists) store.checklists={};
   if(!store.checklists[key]) store.checklists[key]={};
   store.checklists[key][idx]=!store.checklists[key][idx];
   save();renderPrep();
@@ -913,7 +915,7 @@ function getChecklistProgress(){
   let total=0,done=0;
   CHECKLIST.forEach(c=>{
     const key=curStation+'_'+c.phase;
-    c.tasks.forEach((_,i)=>{total++;if(store.checklists[key]?.[i])done++});
+    c.tasks.forEach((_,i)=>{total++;if(store.checklists?.[key]?.[i])done++});
   });
   return {total,done,pct:total?Math.round(done/total*100):0};
 }
