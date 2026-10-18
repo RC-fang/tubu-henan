@@ -965,9 +965,52 @@ function renderHome(){
     <div class="stat"><div class="v">${s.booth||'—'}</div><div class="l">展位数</div></div>
     <div class="stat ok"><div class="v">${salesText}</div><div class="l">带动销售</div></div>`;
   const prog=getChecklistProgress();
-  document.getElementById('homeChecklist').innerHTML=`
-    <div style="display:flex;justify-content:space-between;margin-bottom:8px"><span>第${curStation}站筹备 已完成 ${prog.done}/${prog.total}</span><span style="color:var(--p);font-weight:600">${prog.pct}%</span></div>
-    <div class="progress"><div class="progress-fill" style="width:${prog.pct}%"></div></div>`;
+  
+  // 检查前8站是否全部完成
+  let allCompleted = true;
+  let completedCount = 0;
+  for(let i=1; i<=8; i++){
+    if(isStationCompleted(i)){
+      completedCount++;
+    } else {
+      allCompleted = false;
+    }
+  }
+  
+  let checklistHtml = '';
+  if(allCompleted && completedCount === 8){
+    // 前8站全部完成，显示整体总结
+    checklistHtml = `
+      <div style="text-align:center;padding:16px">
+        <div style="font-size:36px;margin-bottom:8px">🎉</div>
+        <div style="font-size:16px;font-weight:600;color:var(--ok);margin-bottom:8px">前8站已全部完成</div>
+        <div style="font-size:13px;color:var(--t2);margin-bottom:16px">所有筹备任务已归档备案</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center">
+          <div>
+            <div style="font-size:20px;font-weight:700;color:var(--p)">8</div>
+            <div style="font-size:11px;color:var(--t2)">已完成站点</div>
+          </div>
+          <div>
+            <div style="font-size:20px;font-weight:700;color:var(--ok)">100%</div>
+            <div style="font-size:11px;color:var(--t2)">完成率</div>
+          </div>
+          <div>
+            <div style="font-size:20px;font-weight:700;color:var(--warn)">${tStations}</div>
+            <div style="font-size:11px;color:var(--t2)">总场次</div>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    // 显示当前站点的筹备进度
+    checklistHtml = `
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+        <span>第${curStation}站筹备 已完成 ${prog.done}/${prog.total}</span>
+        <span style="color:var(--p);font-weight:600">${prog.pct}%</span>
+      </div>
+      <div class="progress"><div class="progress-fill" style="width:${prog.pct}%"></div></div>
+      ${completedCount > 0 ? `<div style="font-size:12px;color:var(--t2);margin-top:8px;text-align:center">已完成 ${completedCount}/8 站</div>` : ''}`;
+  }
+  document.getElementById('homeChecklist').innerHTML = checklistHtml;
 
   // Station products
   document.getElementById('productsTitle').textContent = '第'+curStation+'站 · 往期展品';
