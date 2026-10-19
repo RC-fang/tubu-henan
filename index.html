@@ -764,7 +764,8 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 // ===== Navigation =====
 document.querySelectorAll('.bn-item').forEach(item=>{
   item.addEventListener('click',function(){
-    // 检查是否有未保存的修改
+    const targetPage = this.dataset.page;
+    // 检查是否有未保存的修改（在更新 curPage 之前）
     if(curPage==='station' && stationDraft){
       const hasChanges=checkStationChanges();
       if(hasChanges){
@@ -773,11 +774,12 @@ document.querySelectorAll('.bn-item').forEach(item=>{
         }
       }
     }
+    // 更新 curPage 和页面显示
     document.querySelectorAll('.bn-item').forEach(n=>n.classList.remove('active'));
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     this.classList.add('active');
-    document.getElementById('pg-'+this.dataset.page).classList.add('active');
-    renderPage(this.dataset.page);
+    document.getElementById('pg-'+targetPage).classList.add('active');
+    renderPage(targetPage);
   });
 });
 
